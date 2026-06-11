@@ -42,19 +42,23 @@
       resultDiv.style.display = 'block';
       resultDiv.innerHTML = '<p style="color:#95a5a6; font-style:italic;">Processing credentials...</p>';
       
-      if (!decodedText.startsWith("ID:")) {
-        resultDiv.innerHTML = "<h3>❌ Invalid QR Code</h3><p>This code does not belong to this event.</p>";
-        resetScanner(3000);
-        return;
-      }
+      var staffId = "";
       
-      var staffId = decodedText.split("ID:")[1].trim();
+      // Smart detection: If the QR code is a full link, extract the ID from the end of it
+      if (decodedText.includes("data=ID:")) {
+        staffId = decodedText.split("data=ID:")[1].trim();
+      } else if (decodedText.startsWith("ID:")) {
+        staffId = decodedText.split("ID:")[1].trim();
+      } else {
+        // If it's just a raw number/text, use it directly
+        staffId = decodedText.trim();
+      }
       
       // Load the data directly into our hidden bridge form and submit it safely
       document.getElementById('formIdField').value = staffId;
       document.getElementById('attendanceForm').submit();
       
-      // Backup timeout in case the connection drops entirely
+      // Backup timeout in case the network delays
       window.backupTimeout = setTimeout(function() {
         if (isProcessing) {
           resultDiv.innerHTML = "<h3>✅ Log Sent</h3><p>Check your spreadsheet directly to verify check-in.</p>";
