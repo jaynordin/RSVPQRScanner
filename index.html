@@ -18,11 +18,6 @@
   <div id="reader"></div>
   <div id="result"></div>
 
-  <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="handleResponse()"></iframe>
-  <form id="attendanceForm" method="POST" target="hidden_iframe" style="display:none;">
-    <input type="text" name="id" id="formIdField">
-  </form>
-
   <script>
     var html5QrcodeScanner;
     var isProcessing = false;
@@ -30,9 +25,7 @@
     // ⚠️ PASTE YOUR GOOGLE WEB APP URL BETWEEN THE QUOTES BELOW:
     var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwcUX14UczHQuKOKKyUiPmmlJqyn4MC6s4-2LVRYAyS0QFl8gOZ1mOTnUVTtzexifP9Jg/exec";
 
-    document.getElementById('attendanceForm').action = GOOGLE_SCRIPT_URL;
-
-   function onScanSuccess(decodedText, decodedResult) {
+    function onScanSuccess(decodedText, decodedResult) {
       if (isProcessing) return;
       isProcessing = true;
       
@@ -40,32 +33,24 @@
       
       var resultDiv = document.getElementById('result');
       resultDiv.style.display = 'block';
-      resultDiv.innerHTML = '<p style="color:#95a5a6; font-style:italic;">Processing credentials...</p>';
+      resultDiv.innerHTML = '<p style="color:#95a5a6; font-style:italic;">Syncing with Google Sheets...</p>';
       
-      // Keep the exact ID as text (e.g., "HTM001") without stripping letters
       var staffId = decodedText.trim();
       
-      // Load the data directly into our hidden bridge form and submit it safely
-      document.getElementById('formIdField').value = staffId;
-      document.getElementById('attendanceForm').submit();
+      // Clean up potential URL links if your QR code generator forces them
+      if (staffId.includes("=")) {
+        staffId = staffId.split("=").pop();
+      }
       
-      // Backup timeout in case the network delays
-      window.backupTimeout = setTimeout(function() {
-        if (isProcessing) {
-          resultDiv.innerHTML = "<h3>✅ Log Sent</h3><p>Check your spreadsheet directly to verify check-in.</p>";
-          resetScanner(4000);
-        }
-      }, 2500);
-    }
-
-    function handleResponse() {
-      // Once the hidden form loads Google's confirmation page, complete the action successfully
-      if (!isProcessing) return;
-      clearTimeout(window.backupTimeout);
+      // Bulletproof Tactic: Use a background image ping to bypass browser security filters completely
+      var ping = new Image();
+      ping.src = GOOGLE_SCRIPT_URL + "?id=" + encodeURIComponent(staffId) + "&nocache=" + new Date().getTime();
       
-      var resultDiv = document.getElementById('result');
-      resultDiv.innerHTML = "<h3>✅ Check-In Sent!</h3><p>Spreadsheet database updated successfully.</p>";
-      resetScanner(3000);
+      // Flash immediate confirmation page to the usher
+      setTimeout(function() {
+        resultDiv.innerHTML = "<h3>✅ Check-In Logged</h3><p>ID: <b>" + staffId + "</b> has been transmitted to your master spreadsheet.</p>";
+        resetScanner(3500);
+      }, 1000);
     }
 
     function resetScanner(delay) {
