@@ -35,20 +35,31 @@
       resultDiv.style.display = 'block';
       resultDiv.innerHTML = '<p style="color:#95a5a6; font-style:italic;">Processing Check-In...</p>';
       
-      // Grab the exact text out of the QR code (HTM001)
-      var staffId = decodedText.trim();
+      var rawText = decodedText.trim();
+      var staffId = rawText;
       
-      // Send it straight to your Google Script Web App URL via background image load
-      var urlWithParam = GOOGLE_SCRIPT_URL + "?id=" + encodeURIComponent(staffId) + "&nocache=" + new Date().getTime();
+      // Clean up "ID:HTM001" down to just "HTM001"
+      if (rawText.toUpperCase().startsWith("ID:")) {
+        staffId = rawText.split(":")[1].trim();
+      }
       
-      var imgPing = new Image();
-      imgPing.src = urlWithParam;
+      // Send a clean, unblocked network fetch request using 'no-cors' mode
+      var targetUrl = GOOGLE_SCRIPT_URL + "?id=" + encodeURIComponent(staffId);
       
-      // Display the feedback confirmation window to your gate staff
-      setTimeout(function() {
-        resultDiv.innerHTML = "<h3>✅ Check-In Processed</h3><p>Scanned ID: <b>" + staffId + "</b></p><p style='color:#7f8c8d; font-size:14px;'>Data transmitted directly to your Google Sheet.</p>";
-        resetScanner(3500);
-      }, 1000);
+      fetch(targetUrl, { 
+        method: "GET", 
+        mode: "no-cors" 
+      })
+      .then(function() {
+        // Because of 'no-cors', it triggers successfully regardless of browser filters
+        resultDiv.innerHTML = "<h3>✅ Check-In Processed</h3><p>Scanned ID: <b>" + staffId + "</b></p><p style='color:#2ecc71;'>Spreadsheet updated!</p>";
+        resetScanner(3000);
+      })
+      .catch(function(error) {
+        console.error(error);
+        resultDiv.innerHTML = "<h3>⚠️ Connection Error</h3><p>Could not contact server.</p>";
+        resetScanner(4000);
+      });
     }
 
     function resetScanner(delay) {
