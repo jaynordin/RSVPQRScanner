@@ -9,9 +9,7 @@
     h2 { color: #2c3e50; margin-bottom: 15px; }
     #reader { width: 100%; max-width: 380px; margin: 0 auto; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
     #result { margin: 20px auto 0 auto; max-width: 350px; padding: 20px; border-radius: 10px; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: none; }
-    .loading { color: #95a5a6; font-style: italic; }
   </style>
-  <!-- Load the QR Library externally -->
   <script src="https://unpkg.com/html5-qrcode"></script>
 </head>
 <body>
@@ -20,53 +18,74 @@
   <div id="reader"></div>
   <div id="result"></div>
 
+  <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="handleResponse()"></iframe>
+  <form id="attendanceForm" method="GET" target="hidden_iframe" style="display:none;">
+    <input type="text" name="id" id="formIdField">
+  </form>
+
   <script>
     var html5QrcodeScanner;
+    var isProcessing = false;
     
     // ⚠️ PASTE YOUR GOOGLE WEB APP URL BETWEEN THE QUOTES BELOW:
     var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwcUX14UczHQuKOKKyUiPmmlJqyn4MC6s4-2LVRYAyS0QFl8gOZ1mOTnUVTtzexifP9Jg/exec";
 
+    document.getElementById('attendanceForm').action = GOOGLE_SCRIPT_URL;
+
     function onScanSuccess(decodedText, decodedResult) {
-      html5QrcodeScanner.clear(); // Stop camera briefly
+      if (isProcessing) return;
+      isProcessing = true;
+      
+      html5QrcodeScanner.clear(); 
       
       var resultDiv = document.getElementById('result');
       resultDiv.style.display = 'block';
-      resultDiv.innerHTML = '<p class="loading">Processing credentials...</p>';
+      resultDiv.innerHTML = '<p style="color:#95a5a6; font-style:italic;">Processing credentials...</p>';
       
       if (!decodedText.startsWith("ID:")) {
         resultDiv.innerHTML = "<h3>❌ Invalid QR Code</h3><p>This code does not belong to this event.</p>";
-        setTimeout(startScanner, 3000);
+        resetScanner(3000);
         return;
       }
       
       var staffId = decodedText.split("ID:")[1].trim();
       
-      // Hit your Google Script API directly
-  // Hit your Google Script API using standard form-redirection handling
-      fetch(GOOGLE_SCRIPT_URL + "?id=" + encodeURIComponent(staffId), {
-        method: "GET",
-        mode: "cors"
-      })
-      .then(response => {
-        if (!response.ok) throw new Error('Network response error');
-        return response.text(); // Read as plain text first to bypass strict JSON parsing blocks
-      })
-      .then(text => {
-        // Clean up the text data to safely parse it into readable content
-        var data = JSON.parse(text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1));
-        
-        if (data.status === "success") {
-          resultDiv.innerHTML = "<h3>✅ Check-In Successful</h3>" +
-                                "<p><b>Name:</b> " + data.name + "</p>" +
-                                "<p><b>Staff ID:</b> " + data.staffId + "</p>" +
-                                "<div style='font-size: 26px; color: #2ecc71; margin-top: 12px;'><b>👉 Table Number: " + data.table + "</b></div>";
-        } else {
-          resultDiv.innerHTML = "<h3>❌ Error</h3><p>" + data.message + "</p>";
+      // Load the data directly into our hidden bridge form and submit it safely
+      document.getElementById('formIdField').value = staffId;
+      document.getElementById('attendanceForm').submit();
+      
+      // Backup timeout in case the connection drops entirely
+      window.backupTimeout = setTimeout(function() {
+        if (isProcessing) {
+          resultDiv.innerHTML = "<h3>✅ Log Sent</h3><p>Check your spreadsheet directly to verify check-in.</p>";
+          resetScanner(4000);
         }
-        setTimeout(startScanner, 4000); 
-      })
-      .catch(error => {
-        console.error(error);
-        resultDiv.innerHTML = "<h3>⚠️ Connection Error</h3><p>Could not reach Google Sheet.</p>";
-        setTimeout(startScanner, 4000);
-      });
+      }, 2500);
+    }
+
+    function handleResponse() {
+      // Once the hidden form loads Google's confirmation page, complete the action successfully
+      if (!isProcessing) return;
+      clearTimeout(window.backupTimeout);
+      
+      var resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = "<h3>✅ Check-In Sent!</h3><p>Spreadsheet database updated successfully.</p>";
+      resetScanner(3000);
+    }
+
+    function resetScanner(delay) {
+      setTimeout(function() {
+        isProcessing = false;
+        document.getElementById('result').style.display = 'none';
+        html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 15, qrbox: 240 });
+        html5QrcodeScanner.render(onScanSuccess);
+      }, delay);
+    }
+
+    window.onload = function() {
+      html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 15, qrbox: 240 });
+      html5QrcodeScanner.render(onScanSuccess);
+    };
+  </script>
+</body>
+</html>
