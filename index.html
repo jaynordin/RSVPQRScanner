@@ -42,32 +42,31 @@
       var staffId = decodedText.split("ID:")[1].trim();
       
       // Hit your Google Script API directly
-      fetch(GOOGLE_SCRIPT_URL + "?id=" + encodeURIComponent(staffId))
-        .then(response => response.json())
-        .then(data => {
-          if (data.status === "success") {
-            resultDiv.innerHTML = "<h3>✅ Check-In Successful</h3>" +
-                                  "<p><b>Name:</b> " + data.name + "</p>" +
-                                  "<p><b>Staff ID:</b> " + data.staffId + "</p>" +
-                                  "<div style='font-size: 26px; color: #2ecc71; margin-top: 12px;'><b>👉 Table Number: " + data.table + "</b></div>";
-          } else {
-            resultDiv.innerHTML = "<h3>❌ Error</h3><p>" + data.message + "</p>";
-          }
-          setTimeout(startScanner, 4000); // Reset scanner for next person
-        })
-        .catch(error => {
-          resultDiv.innerHTML = "<h3>⚠️ Connection Error</h3><p>Could not reach Google Sheet.</p>";
-          setTimeout(startScanner, 4000);
-        });
-    }
-
-    function startScanner() {
-      document.getElementById('result').style.display = 'none';
-      html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 15, qrbox: 240 });
-      html5QrcodeScanner.render(onScanSuccess);
-    }
-
-    window.onload = startScanner;
-  </script>
-</body>
-</html>
+  // Hit your Google Script API using standard form-redirection handling
+      fetch(GOOGLE_SCRIPT_URL + "?id=" + encodeURIComponent(staffId), {
+        method: "GET",
+        mode: "cors"
+      })
+      .then(response => {
+        if (!response.ok) throw new Error('Network response error');
+        return response.text(); // Read as plain text first to bypass strict JSON parsing blocks
+      })
+      .then(text => {
+        // Clean up the text data to safely parse it into readable content
+        var data = JSON.parse(text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1));
+        
+        if (data.status === "success") {
+          resultDiv.innerHTML = "<h3>✅ Check-In Successful</h3>" +
+                                "<p><b>Name:</b> " + data.name + "</p>" +
+                                "<p><b>Staff ID:</b> " + data.staffId + "</p>" +
+                                "<div style='font-size: 26px; color: #2ecc71; margin-top: 12px;'><b>👉 Table Number: " + data.table + "</b></div>";
+        } else {
+          resultDiv.innerHTML = "<h3>❌ Error</h3><p>" + data.message + "</p>";
+        }
+        setTimeout(startScanner, 4000); 
+      })
+      .catch(error => {
+        console.error(error);
+        resultDiv.innerHTML = "<h3>⚠️ Connection Error</h3><p>Could not reach Google Sheet.</p>";
+        setTimeout(startScanner, 4000);
+      });
