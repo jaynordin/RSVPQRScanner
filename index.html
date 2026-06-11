@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Staff Gate Check-In</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; text-align: center; background: #f8f9fa; padding: 15px; margin: 0; }
+    h2 { color: #2c3e50; margin-bottom: 15px; }
+    #reader { width: 100%; max-width: 380px; margin: 0 auto; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+    #result { margin: 20px auto 0 auto; max-width: 350px; padding: 20px; border-radius: 10px; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: none; }
+    .loading { color: #95a5a6; font-style: italic; }
+  </style>
+  <!-- Load the QR Library externally -->
+  <script src="https://unpkg.com/html5-qrcode"></script>
+</head>
+<body>
+
+  <h2>Staff Gate Check-In</h2>
+  <div id="reader"></div>
+  <div id="result"></div>
+
+  <script>
+    var html5QrcodeScanner;
+    
+    // ⚠️ PASTE YOUR GOOGLE WEB APP URL BETWEEN THE QUOTES BELOW:
+    var GOOGLE_SCRIPT_URL = "https://script.googleusercontent.com/macros/echo?user_content_key=AUkAhnTRSSNAukoNoKeTq2r2XCr8aZPSgjCJXAoia0qJ8hdAd31A6qXWj6yroCn1mdGktbkZepS4IyYIXFnmLF1j75edDgpZuBczVcsjqSAHleMYrc7pPRZIv0M-NLitGvywzJDSpEPayE6YbAnh_tAOgnSb-Tkz3GwSwTo3FGLAQtDlTRvDpghVWAALeeI2LEfCfk3f551y0YnkGUsGJI3UZHDbbWvOvZoTOyX7mAhuKCWwX0VxdAOzYfW5LELqqoE30jvaTu7pcLw5YO9nh-Edr1asjh_xtA&lib=MRbdqvVy2vtRDUd72IMWXJhSoskMlA9Sb";
+
+    function onScanSuccess(decodedText, decodedResult) {
+      html5QrcodeScanner.clear(); // Stop camera briefly
+      
+      var resultDiv = document.getElementById('result');
+      resultDiv.style.display = 'block';
+      resultDiv.innerHTML = '<p class="loading">Processing credentials...</p>';
+      
+      if (!decodedText.startsWith("ID:")) {
+        resultDiv.innerHTML = "<h3>❌ Invalid QR Code</h3><p>This code does not belong to this event.</p>";
+        setTimeout(startScanner, 3000);
+        return;
+      }
+      
+      var staffId = decodedText.split("ID:")[1].trim();
+      
+      // Hit your Google Script API directly
+      fetch(GOOGLE_SCRIPT_URL + "?id=" + encodeURIComponent(staffId))
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === "success") {
+            resultDiv.innerHTML = "<h3>✅ Check-In Successful</h3>" +
+                                  "<p><b>Name:</b> " + data.name + "</p>" +
+                                  "<p><b>Staff ID:</b> " + data.staffId + "</p>" +
+                                  "<div style='font-size: 26px; color: #2ecc71; margin-top: 12px;'><b>👉 Table Number: " + data.table + "</b></div>";
+          } else {
+            resultDiv.innerHTML = "<h3>❌ Error</h3><p>" + data.message + "</p>";
+          }
+          setTimeout(startScanner, 4000); // Reset scanner for next person
+        })
+        .catch(error => {
+          resultDiv.innerHTML = "<h3>⚠️ Connection Error</h3><p>Could not reach Google Sheet.</p>";
+          setTimeout(startScanner, 4000);
+        });
+    }
+
+    function startScanner() {
+      document.getElementById('result').style.display = 'none';
+      html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 15, qrbox: 240 });
+      html5QrcodeScanner.render(onScanSuccess);
+    }
+
+    window.onload = startScanner;
+  </script>
+</body>
+</html>
