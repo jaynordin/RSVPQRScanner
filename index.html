@@ -32,7 +32,7 @@
 
     document.getElementById('attendanceForm').action = GOOGLE_SCRIPT_URL;
 
-    function onScanSuccess(decodedText, decodedResult) {
+   function onScanSuccess(decodedText, decodedResult) {
       if (isProcessing) return;
       isProcessing = true;
       
@@ -42,17 +42,8 @@
       resultDiv.style.display = 'block';
       resultDiv.innerHTML = '<p style="color:#95a5a6; font-style:italic;">Processing credentials...</p>';
       
-      var staffId = "";
-      
-      // Smart detection: If the QR code is a full link, extract the ID from the end of it
-      if (decodedText.includes("data=ID:")) {
-        staffId = decodedText.split("data=ID:")[1].trim();
-      } else if (decodedText.startsWith("ID:")) {
-        staffId = decodedText.split("ID:")[1].trim();
-      } else {
-        // If it's just a raw number/text, use it directly
-        staffId = decodedText.trim();
-      }
+      // Keep the exact ID as text (e.g., "HTM001") without stripping letters
+      var staffId = decodedText.trim();
       
       // Load the data directly into our hidden bridge form and submit it safely
       document.getElementById('formIdField').value = staffId;
