@@ -23,7 +23,7 @@
     var isProcessing = false;
     
     // ⚠️ PASTE YOUR GOOGLE WEB APP URL BETWEEN THE QUOTES BELOW:
-    var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwcUX14UczHQuKOKKyUiPmmlJqyn4MC6s4-2LVRYAyS0QFl8gOZ1mOTnUVTtzexifP9Jg/exec";
+    var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxdok04fCs9-zoQmWIq7zqwxknw000XnIwrcKP2R5ZHvD7lJrbVNLtBQedUts52I7MP5Q/exec";
 
     function onScanSuccess(decodedText, decodedResult) {
       if (isProcessing) return;
@@ -33,22 +33,20 @@
       
       var resultDiv = document.getElementById('result');
       resultDiv.style.display = 'block';
-      resultDiv.innerHTML = '<p style="color:#95a5a6; font-style:italic;">Syncing with Google Sheets...</p>';
+      resultDiv.innerHTML = '<p style="color:#95a5a6; font-style:italic;">Processing Check-In...</p>';
       
+      // Grab the exact text out of the QR code (HTM001)
       var staffId = decodedText.trim();
       
-      // Clean up potential URL links if your QR code generator forces them
-      if (staffId.includes("=")) {
-        staffId = staffId.split("=").pop();
-      }
+      // Send it straight to your Google Script Web App URL via background image load
+      var urlWithParam = GOOGLE_SCRIPT_URL + "?id=" + encodeURIComponent(staffId) + "&nocache=" + new Date().getTime();
       
-      // Bulletproof Tactic: Use a background image ping to bypass browser security filters completely
-      var ping = new Image();
-      ping.src = GOOGLE_SCRIPT_URL + "?id=" + encodeURIComponent(staffId) + "&nocache=" + new Date().getTime();
+      var imgPing = new Image();
+      imgPing.src = urlWithParam;
       
-      // Flash immediate confirmation page to the usher
+      // Display the feedback confirmation window to your gate staff
       setTimeout(function() {
-        resultDiv.innerHTML = "<h3>✅ Check-In Logged</h3><p>ID: <b>" + staffId + "</b> has been transmitted to your master spreadsheet.</p>";
+        resultDiv.innerHTML = "<h3>✅ Check-In Processed</h3><p>Scanned ID: <b>" + staffId + "</b></p><p style='color:#7f8c8d; font-size:14px;'>Data transmitted directly to your Google Sheet.</p>";
         resetScanner(3500);
       }, 1000);
     }
