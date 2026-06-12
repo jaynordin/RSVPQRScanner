@@ -77,6 +77,7 @@
       font-weight: bold !important;
       letter-spacing: 1.5px !important;
       cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
 
     .laser-line {
@@ -122,9 +123,11 @@
     .success-header {
       color: var(--gold-light);
       font-size: 16px;
+      font-weight: normal;
       text-transform: uppercase;
       letter-spacing: 4px;
       margin-bottom: 25px;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
     }
 
     .gold-divider {
@@ -151,6 +154,7 @@
 
     .data-value {
       font-size: 18px;
+      letter-spacing: 0.5px;
       color: #ffffff;
     }
 
@@ -159,6 +163,7 @@
       padding: 12px;
       border: 1px dashed rgba(214, 175, 87, 0.4);
       border-radius: 4px;
+      background: rgba(214, 175, 87, 0.02);
     }
 
     .table-title {
@@ -167,10 +172,12 @@
       color: var(--gold-primary);
       text-transform: uppercase;
       letter-spacing: 2px;
+      margin-bottom: 2px;
     }
 
     .table-number {
       font-size: 26px;
+      font-weight: normal;
       color: var(--gold-light);
     }
 
@@ -199,13 +206,11 @@
 
   <div id="result"></div>
 
-  <iframe id="secret_bridge" style="display:none;"></iframe>
-
   <script>
     var html5QrcodeScanner;
     var isProcessing = false;
     
-    // ⚠️ PASTE YOUR ACTIVE NEW VERSION LINK HERE:
+    // ⚠️ YOUR ACTIVE SECURE SCRIPT BACKEND LINK:
     var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxdok04fCs9-zoQmWIq7zqwxknw000XnIwrcKP2R5ZHvD7lJrbVNLtBQedUts52I7MP5Q/exec";
 
     function onScanSuccess(decodedText, decodedResult) {
@@ -226,55 +231,55 @@
         staffId = rawText.split(":")[1].trim();
       }
       
-      // FALLBACK SAFE PROFILE INDEX
-      var displayName = "HONORED GUEST";
-      var calculatedTable = "1";
-      var displayOutlet = "-";
-      
-      if(staffId.toUpperCase() === "HTM001") {
-        displayName = "M. UZAIR NORDIN";
-        calculatedTable = "1";
-        displayOutlet = "HQ";
-      }
-
       var targetUrl = GOOGLE_SCRIPT_URL + "?id=" + encodeURIComponent(staffId);
-      var bridge = document.getElementById('secret_bridge');
       
-      // Use your exact working fetch mechanism to record check-in status instantly
-      fetch(targetUrl, { method: "GET", mode: "no-cors" });
-      
-      // Read the data stream details natively using iframe reflection mapping
-      bridge.src = targetUrl;
-      
-      setTimeout(function() {
-        try {
-          var responseText = bridge.contentWindow.document.body.innerText;
-          if (responseText && responseText.includes("SUCCESS")) {
-            var parts = responseText.split("|");
-            displayName = parts[1];
-            calculatedTable = parts[2];
-            displayOutlet = parts[3];
-          }
-        } catch(e) {
-          // If browser restricts sandbox reading, it safely uses the matching profile configurations above
+      // 🌟 BACK TO ORIGINAL: Runs check-in without blocking the interface layout
+      fetch(targetUrl, { 
+        method: "GET", 
+        mode: "no-cors" 
+      })
+      .then(function() {
+        var displayId = staffId;
+        var displayName = "HONORED GUEST";
+        var calculatedTable = "1"; 
+        var displayOutlet = "-"; // Default state fallback
+        
+        // 🌟 ADD YOUR GUESTS HERE TO DISPLAY LIVE INFO SAFELY:
+        if(displayId.toUpperCase() === "HTM001") {
+          displayName = "M. UZAIR NORDIN";
+          calculatedTable = "1";
+          displayOutlet = "HQ";
+        }
+        else if(displayId.toUpperCase() === "HTM002") {
+          displayName = "NURIN ZAKIRAH";
+          calculatedTable = "2";
+          displayOutlet = "KAMPAR";
         }
 
-        // Render visual frame card layout
         resultDiv.classList.add('animate-entrance');
+
         resultDiv.innerHTML = 
           '<div class="success-header">✨ Welcome ✨</div>' +
           '<div class="data-row"><div class="data-label">Guest Name</div><div class="data-value" style="color:var(--gold-light); font-weight:bold;">' + displayName + '</div></div>' +
           '<div class="gold-divider"></div>' +
+          
+          // 🌟 LIVE OUTLET ROW ADDED BEAUTIFULLY BELOW GUEST NAME
           '<div class="data-row"><div class="data-label">Outlet</div><div class="data-value" style="color:#ffffff;">' + displayOutlet + '</div></div>' +
           '<div class="gold-divider"></div>' +
-          '<div class="data-row"><div class="data-label">Invitation Code</div><div class="data-value" style="font-size:14px; font-family:monospace;">' + staffId + '</div></div>' +
+          
+          '<div class="data-row"><div class="data-label">Invitation Code</div><div class="data-value" style="font-size:14px; font-family:monospace;">' + displayId + '</div></div>' +
           '<div class="table-badge">' +
             '<div class="table-title">Table Assignment</div>' +
             '<div class="table-number">' + calculatedTable + '</div>' +
           '</div>';
 
-        resetScanner(6000);
-      }, 1200); // 1.2s delay ensures background writes finish before card displays
+        resetScanner(6000); 
+      })
+      .catch(function(error) {
+        console.error(error);
+        resultDiv.innerHTML = "<h3 style='color:#fc8181;'>System Timeout</h3><p style='font-size:13px;'>Please verify database connectivity.</p>";
+        resetScanner(4000);
+      });
     }
 
     function resetScanner(delay) {
