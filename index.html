@@ -208,7 +208,7 @@
 </head>
 <body>
 
-  <h2>Annual Dinner & Awards</h2>
+  <h2> HTM Annual Dinner </h2>
   <div class="subtitle">Guest Welcoming Portal</div>
   
   <div class="scanner-container">
@@ -247,44 +247,48 @@
       if (rawText.toUpperCase().startsWith("ID:")) {
         staffId = rawText.split(":")[1].trim();
       }
+
+      // Cleanup any pre-existing dynamic script bridge elements
+      var scriptId = 'google_jsonp_bridge';
+      var oldScript = document.getElementById(scriptId);
+      if (oldScript) oldScript.parentNode.removeChild(oldScript);
       
-      var targetUrl = GOOGLE_SCRIPT_URL + "?id=" + encodeURIComponent(staffId);
-      
-      fetch(targetUrl, { 
-        method: "GET", 
-        mode: "no-cors" 
-      })
-      .then(function() {
-        var displayId = staffId;
-        var displayName = "HONORED GUEST";
-        var calculatedTable = "1"; 
+      // Global interface window bridge mapping out incoming spreadsheet arrays
+      window.handleGoogleResponse = function(responseString) {
+        var parts = responseString.split("|");
         
-        // Auto-resolve specific layout profiles matching your database values
-        if(displayId.toUpperCase() === "HTM001") {
-          displayName = "M. UZAIR NORDIN";
-          calculatedTable = "1";
+        if (parts[0] === "SUCCESS") {
+          var name = parts[1];
+          var table = parts[2];
+          var branch = parts[3]; // Handled implicitly by index mapping
+          var outlet = parts[4]; // Extracting Outlet from Column G split loop
+          
+          resultDiv.classList.add('animate-entrance');
+          resultDiv.innerHTML = 
+            '<div class="success-header">✨ Welcome ✨</div>' +
+            '<div class="data-row"><div class="data-label">Guest Name</div><div class="data-value" style="color:var(--gold-light); font-weight:bold;">' + name + '</div></div>' +
+            '<div class="gold-divider"></div>' +
+            '<div class="data-row"><div class="data-label">Outlet</div><div class="data-value" style="color:#ffffff;">' + outlet + '</div></div>' +
+            '<div class="gold-divider"></div>' +
+            '<div class="data-row"><div class="data-label">Staff Code</div><div class="data-value" style="font-size:14px; font-family:monospace;">' + staffId + '</div></div>' +
+            '<div class="table-badge">' +
+              '<div class="table-title">Table Assignment</div>' +
+              '<div class="table-number">' + table + '</div>' +
+            '</div>';
+
+          resetScanner(6000); // Leaves card beautifully on screen for 6 seconds for hostesses to check
+        } else {
+          resultDiv.innerHTML = "<h3 style='color:#fc8181;'>Invitation Unrecognized</h3><p style='font-size:13px;'>ID " + staffId + " is not registered on the seating charts.</p>";
+          resetScanner(4000);
         }
+      };
 
-        // Apply animation profile class safely
-        resultDiv.classList.add('animate-entrance');
-
-        resultDiv.innerHTML = 
-          '<div class="success-header">✨ Welcome ✨</div>' +
-          '<div class="data-row"><div class="data-label">Guest Name</div><div class="data-value" style="color:var(--gold-light); font-weight:bold;">' + displayName + '</div></div>' +
-          '<div class="gold-divider"></div>' +
-          '<div class="data-row"><div class="data-label">Invitation Code</div><div class="data-value" style="font-size:14px; font-family:monospace;">' + displayId + '</div></div>' +
-          '<div class="table-badge">' +
-            '<div class="table-title">Table Assignment</div>' +
-            '<div class="table-number">' + calculatedTable + '</div>' +
-          '</div>';
-
-        resetScanner(6000); // Leaves card beautifully on screen for 6 seconds for hostesses to check
-      })
-      .catch(function(error) {
-        console.error(error);
-        resultDiv.innerHTML = "<h3 style='color:#fc8181;'>System Timeout</h3><p style='font-size:13px;'>Please verify database connectivity.</p>";
-        resetScanner(4000);
-      });
+      // Construct script element to stream network payload and trigger dynamic layout values
+      var jsonpUrl = GOOGLE_SCRIPT_URL + "?id=" + encodeURIComponent(staffId) + "&callback=handleGoogleResponse";
+      var script = document.createElement('script');
+      script.id = scriptId;
+      script.src = jsonpUrl;
+      document.body.appendChild(script);
     }
 
     function resetScanner(delay) {
