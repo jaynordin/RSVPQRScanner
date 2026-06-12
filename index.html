@@ -223,7 +223,7 @@
     var html5QrcodeScanner;
     var isProcessing = false;
     
-    // ⚠️ PRESERVED YOUR SECURE WEB APP LINK BELOW:
+    // ⚠️ YOUR ACTIVE SECURE SCRIPT BACKEND LINK:
     var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxdok04fCs9-zoQmWIq7zqwxknw000XnIwrcKP2R5ZHvD7lJrbVNLtBQedUts52I7MP5Q/exec";
 
     function onScanSuccess(decodedText, decodedResult) {
@@ -253,21 +253,17 @@
         var parts = responseString.split("|");
         
         if (parts[0] === "SUCCESS") {
-          var name = parts[1];
-          var table = parts[2];
-          var branch = parts[3]; // Still split out in order from backend arrays
-          var outlet = parts[4]; // 🌟 NEW: Captures the Outlet payload from column G
+          var name = parts[1];    // Column A
+          var table = parts[2];   // Column C
+          var outlet = parts[3];  // Column G (Pushed forward because column F was skipped)
           
           resultDiv.classList.add('animate-entrance');
           resultDiv.innerHTML = 
             '<div class="success-header">✨ Welcome ✨</div>' +
             '<div class="data-row"><div class="data-label">Guest Name</div><div class="data-value" style="color:var(--gold-light); font-weight:bold;">' + name + '</div></div>' +
             '<div class="gold-divider"></div>' +
-            
-            // 🌟 SWAPPED: Removed branch row and replaced it with your clean Outlet row layout
             '<div class="data-row"><div class="data-label">Outlet</div><div class="data-value" style="color:#ffffff;">' + outlet + '</div></div>' +
             '<div class="gold-divider"></div>' +
-            
             '<div class="data-row"><div class="data-label">Invitation Code</div><div class="data-value" style="font-size:14px; font-family:monospace;">' + staffId + '</div></div>' +
             '<div class="table-badge">' +
               '<div class="table-title">Table Assignment</div>' +
@@ -283,4 +279,28 @@
 
       // Construct script element to bypass CORS block and read row response string directly
       var jsonpUrl = GOOGLE_SCRIPT_URL + "?id=" + encodeURIComponent(staffId) + "&callback=handleGoogleResponse";
-      var script = document.createElement('
+      var script = document.createElement('script');
+      script.id = scriptId;
+      script.src = jsonpUrl;
+      document.body.appendChild(script);
+    }
+
+    function resetScanner(delay) {
+      setTimeout(function() {
+        isProcessing = false;
+        var resultDiv = document.getElementById('result');
+        resultDiv.classList.remove('animate-entrance');
+        resultDiv.style.display = 'none';
+        
+        html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 24, qrbox: 240, rememberLastUsedCamera: true });
+        html5QrcodeScanner.render(onScanSuccess);
+      }, delay);
+    }
+
+    window.onload = function() {
+      html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 24, qrbox: 240, rememberLastUsedCamera: true });
+      html5QrcodeScanner.render(onScanSuccess);
+    };
+  </script>
+</body>
+</html>
