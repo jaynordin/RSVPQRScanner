@@ -231,25 +231,19 @@
         staffId = rawText.split(":")[1].trim();
       }
       
-      // 🌟 SECURE FETCH FOR 100+ GUESTS: Pulls directly from the web response stream
-      var targetUrl = GOOGLE_SCRIPT_URL + "?id=" + encodeURIComponent(staffId);
+      / 🌟 AUTOMATED SECURE FETCH FOR 100+ GUESTS
+      var scriptId = 'google_jsonp_bridge';
+      var oldScript = document.getElementById(scriptId);
+      if (oldScript) oldScript.parentNode.removeChild(oldScript);
       
-      fetch(targetUrl)
-      .then(function(response) {
-        return response.text(); // Converts the sheet data block to readable text
-      })
-      .then(function(responseText) {
-        var displayName = "HONORED GUEST";
-        var calculatedTable = "-";
-        var displayOutlet = "-";
-        
-        // Split the data string sent by your Google Script: "SUCCESS|Name|Table|Outlet"
+      // Define what to do when Google responds with the guest's data
+      window.handleGoogleResponse = function(responseText) {
         var parts = responseText.split("|");
         
         if (parts[0] === "SUCCESS") {
-          displayName = parts[1];    // Live from Column A
-          calculatedTable = parts[2]; // Live from Column C
-          displayOutlet = parts[3];   // Live from Column G
+          var displayName = parts[1];    // Automatically reads Column A
+          var calculatedTable = parts[2]; // Automatically reads Column C
+          var displayOutlet = parts[3];   // Automatically reads Column G
           
           resultDiv.classList.add('animate-entrance');
           resultDiv.innerHTML = 
@@ -267,6 +261,14 @@
           resultDiv.innerHTML = "<h3 style='color:#fc8181;'>Invitation Unrecognized</h3><p style='font-size:13px;'>ID " + staffId + " is not registered on the seating charts.</p>";
         }
         resetScanner(6000); 
+      };
+
+      // Create a temporary script link to request data without triggering browser security locks
+      var jsonpUrl = GOOGLE_SCRIPT_URL + "?id=" + encodeURIComponent(staffId) + "&callback=handleGoogleResponse";
+      var script = document.createElement('script');
+      script.id = scriptId;
+      script.src = jsonpUrl;
+      document.body.appendChild(script);
       })
       .catch(function(error) {
         console.error(error);
