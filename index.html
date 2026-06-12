@@ -210,7 +210,7 @@
     var html5QrcodeScanner;
     var isProcessing = false;
     
-    // ⚠️ YOUR ACTIVE SECURE SCRIPT BACKEND LINK:
+    // ⚠️ YOUR ACTIVE GOOGLE SCRIPT BACKEND LINK:
     var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxdok04fCs9-zoQmWIq7zqwxknw000XnIwrcKP2R5ZHvD7lJrbVNLtBQedUts52I7MP5Q/exec";
 
     function onScanSuccess(decodedText, decodedResult) {
@@ -231,48 +231,41 @@
         staffId = rawText.split(":")[1].trim();
       }
       
+      // 🌟 SECURE FETCH FOR 100+ GUESTS: Pulls directly from the web response stream
       var targetUrl = GOOGLE_SCRIPT_URL + "?id=" + encodeURIComponent(staffId);
       
-      // 🌟 BACK TO ORIGINAL: Runs check-in without blocking the interface layout
-      fetch(targetUrl, { 
-        method: "GET", 
-        mode: "no-cors" 
+      fetch(targetUrl)
+      .then(function(response) {
+        return response.text(); // Converts the sheet data block to readable text
       })
-      .then(function() {
-        var displayId = staffId;
+      .then(function(responseText) {
         var displayName = "HONORED GUEST";
-        var calculatedTable = "1"; 
-        var displayOutlet = "-"; // Default state fallback
+        var calculatedTable = "-";
+        var displayOutlet = "-";
         
-        // 🌟 ADD YOUR GUESTS HERE TO DISPLAY LIVE INFO SAFELY:
-        if(displayId.toUpperCase() === "HTM001") {
-          displayName = "M. UZAIR NORDIN";
-          calculatedTable = "1";
-          displayOutlet = "HQ";
-        }
-        else if(displayId.toUpperCase() === "HTM002") {
-          displayName = "NURIN ZAKIRAH";
-          calculatedTable = "2";
-          displayOutlet = "KAMPAR";
-        }
-
-        resultDiv.classList.add('animate-entrance');
-
-        resultDiv.innerHTML = 
-          '<div class="success-header">✨ Welcome ✨</div>' +
-          '<div class="data-row"><div class="data-label">Guest Name</div><div class="data-value" style="color:var(--gold-light); font-weight:bold;">' + displayName + '</div></div>' +
-          '<div class="gold-divider"></div>' +
+        // Split the data string sent by your Google Script: "SUCCESS|Name|Table|Outlet"
+        var parts = responseText.split("|");
+        
+        if (parts[0] === "SUCCESS") {
+          displayName = parts[1];    // Live from Column A
+          calculatedTable = parts[2]; // Live from Column C
+          displayOutlet = parts[3];   // Live from Column G
           
-          // 🌟 LIVE OUTLET ROW ADDED BEAUTIFULLY BELOW GUEST NAME
-          '<div class="data-row"><div class="data-label">Outlet</div><div class="data-value" style="color:#ffffff;">' + displayOutlet + '</div></div>' +
-          '<div class="gold-divider"></div>' +
-          
-          '<div class="data-row"><div class="data-label">Invitation Code</div><div class="data-value" style="font-size:14px; font-family:monospace;">' + displayId + '</div></div>' +
-          '<div class="table-badge">' +
-            '<div class="table-title">Table Assignment</div>' +
-            '<div class="table-number">' + calculatedTable + '</div>' +
-          '</div>';
-
+          resultDiv.classList.add('animate-entrance');
+          resultDiv.innerHTML = 
+            '<div class="success-header">✨ Welcome ✨</div>' +
+            '<div class="data-row"><div class="data-label">Guest Name</div><div class="data-value" style="color:var(--gold-light); font-weight:bold;">' + displayName + '</div></div>' +
+            '<div class="gold-divider"></div>' +
+            '<div class="data-row"><div class="data-label">Outlet</div><div class="data-value" style="color:#ffffff;">' + displayOutlet + '</div></div>' +
+            '<div class="gold-divider"></div>' +
+            '<div class="data-row"><div class="data-label">Invitation Code</div><div class="data-value" style="font-size:14px; font-family:monospace;">' + staffId + '</div></div>' +
+            '<div class="table-badge">' +
+              '<div class="table-title">Table Assignment</div>' +
+              '<div class="table-number">' + calculatedTable + '</div>' +
+            '</div>';
+        } else {
+          resultDiv.innerHTML = "<h3 style='color:#fc8181;'>Invitation Unrecognized</h3><p style='font-size:13px;'>ID " + staffId + " is not registered on the seating charts.</p>";
+        }
         resetScanner(6000); 
       })
       .catch(function(error) {
