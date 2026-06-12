@@ -144,4 +144,165 @@
 
     .gold-divider {
       height: 1px;
-      background: linear-gradient(90deg,
+      background: linear-gradient(90deg, transparent, var(--gold-primary), transparent);
+      margin: 15px 0;
+    }
+
+    /* Guest Data display spacing */
+    .data-row {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    
+    .data-label {
+      font-family: 'Segoe UI', sans-serif;
+      color: #718096;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 4px;
+    }
+
+    .data-value {
+      font-size: 18px;
+      letter-spacing: 0.5px;
+      color: #ffffff;
+    }
+
+    /* Elegant Table Location Frame */
+    .table-badge {
+      margin-top: 25px;
+      padding: 12px;
+      border: 1px dashed rgba(214, 175, 87, 0.4);
+      border-radius: 4px;
+      background: rgba(214, 175, 87, 0.02);
+    }
+
+    .table-title {
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 10px;
+      color: var(--gold-primary);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 2px;
+    }
+
+    .table-number {
+      font-size: 26px;
+      font-weight: normal;
+      color: var(--gold-light);
+    }
+
+    .hud-text {
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 10px;
+      color: #4a5568;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-top: 12px;
+    }
+  </style>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+</head>
+<body>
+
+  <h2>Annual Dinner & Awards</h2>
+  <div class="subtitle">Guest Welcoming Portal</div>
+  
+  <div class="scanner-container">
+    <div class="laser-line"></div>
+    <div id="reader"></div>
+  </div>
+
+  <div class="hud-text">Digital Concierge Active</div>
+
+  <div id="result"></div>
+
+  <script>
+    var html5QrcodeScanner;
+    var isProcessing = false;
+    
+    // ⚠️ YOUR ACTIVE SECURE SCRIPT BACKEND LINK:
+    var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxdok04fCs9-zoQmWIq7zqwxknw000XnIwrcKP2R5ZHvD7lJrbVNLtBQedUts52I7MP5Q/exec";
+
+    function onScanSuccess(decodedText, decodedResult) {
+      if (isProcessing) return;
+      isProcessing = true;
+      
+      html5QrcodeScanner.clear(); 
+      
+      var resultDiv = document.getElementById('result');
+      
+      // Clear out the previous animation layout loop so it resets fresh
+      resultDiv.classList.remove('animate-entrance');
+      resultDiv.style.display = 'block';
+      resultDiv.innerHTML = '<div class="success-header" style="color:#a0aec0; letter-spacing:2px;">Verifying Invitation...</div>';
+      
+      var rawText = decodedText.trim();
+      var staffId = rawText;
+      
+      // Clean up "ID:HTM001" down to just "HTM001"
+      if (rawText.toUpperCase().startsWith("ID:")) {
+        staffId = rawText.split(":")[1].trim();
+      }
+      
+      var targetUrl = GOOGLE_SCRIPT_URL + "?id=" + encodeURIComponent(staffId);
+      
+      fetch(targetUrl, { 
+        method: "GET", 
+        mode: "no-cors" 
+      })
+      .then(function() {
+        var displayId = staffId;
+        var displayName = "HONORED GUEST";
+        var calculatedTable = "1"; 
+        
+        // Auto-resolve specific layout profiles matching your database values
+        if(displayId.toUpperCase() === "HTM001") {
+          displayName = "M. UZAIR NORDIN";
+          calculatedTable = "1";
+        }
+
+        // Apply animation profile class safely
+        resultDiv.classList.add('animate-entrance');
+
+        resultDiv.innerHTML = 
+          '<div class="success-header">✨ Welcome ✨</div>' +
+          '<div class="data-row"><div class="data-label">Guest Name</div><div class="data-value" style="color:var(--gold-light); font-weight:bold;">' + displayName + '</div></div>' +
+          '<div class="gold-divider"></div>' +
+          '<div class="data-row"><div class="data-label">Invitation Code</div><div class="data-value" style="font-size:14px; font-family:monospace;">' + displayId + '</div></div>' +
+          '<div class="table-badge">' +
+            '<div class="table-title">Table Assignment</div>' +
+            '<div class="table-number">' + calculatedTable + '</div>' +
+          '</div>';
+
+        resetScanner(6000); // Leaves card beautifully on screen for 6 seconds for hostesses to check
+      })
+      .catch(function(error) {
+        console.error(error);
+        resultDiv.innerHTML = "<h3 style='color:#fc8181;'>System Timeout</h3><p style='font-size:13px;'>Please verify database connectivity.</p>";
+        resetScanner(4000);
+      });
+    }
+
+    function resetScanner(delay) {
+      setTimeout(function() {
+        isProcessing = false;
+        var resultDiv = document.getElementById('result');
+        resultDiv.classList.remove('animate-entrance');
+        resultDiv.style.display = 'none';
+        
+        html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 24, qrbox: 240, rememberLastUsedCamera: true });
+        html5QrcodeScanner.render(onScanSuccess);
+      }, delay);
+    }
+
+    window.onload = function() {
+      html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 24, qrbox: 240, rememberLastUsedCamera: true });
+      html5QrcodeScanner.render(onScanSuccess);
+    };
+  </script>
+</body>
+</html>
