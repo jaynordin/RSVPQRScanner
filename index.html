@@ -213,6 +213,29 @@
     // ⚠️ CHOOSE OR PASTE YOUR CURRENT GOOGLE SCRIPT LINK HERE:
     var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxdok04fCs9-zoQmWIq7zqwxknw000XnIwrcKP2R5ZHvD7lJrbVNLtBQedUts52I7MP5Q/exec";
 
+    // 🌟 AI VOICE SYNTHESIS WELCOME FUNCTION
+    function speakWelcome() {
+      if ('speechSynthesis' in window) {
+        // Clear out any voice cues currently stacked up to keep timing immediate
+        window.speechSynthesis.cancel();
+        
+        var message = new SpeechSynthesisUtterance("Welcome");
+        
+        // Find a high-quality professional voice engine option if present
+        var voices = window.speechSynthesis.getVoices();
+        for (var i = 0; i < voices.length; i++) {
+          if (voices[i].name.includes("Google US English") || voices[i].name.includes("Natural")) {
+            message.voice = voices[i];
+            break;
+          }
+        }
+        
+        message.rate = 0.95;  // Formal greeting speed
+        message.pitch = 1.05; // Friendly tonality baseline
+        window.speechSynthesis.speak(message);
+      }
+    }
+
     function onScanSuccess(decodedText, decodedResult) {
       if (isProcessing) return;
       isProcessing = true;
@@ -245,6 +268,9 @@
             var calculatedTable = parts[2]; 
             var displayOutlet = parts[3];   
             
+            // 🌟 TRIGGER THE AUDIO ANNOUNCEMENT IMMEDIATELY
+            speakWelcome();
+            
             resultDiv.classList.add('animate-entrance');
             resultDiv.innerHTML = 
               '<div class="success-header">✨ Welcome ✨</div>' +
@@ -252,61 +278,4 @@
               '<div class="gold-divider"></div>' +
               '<div class="data-row"><div class="data-label">Outlet</div><div class="data-value" style="color:#ffffff;">' + displayOutlet + '</div></div>' +
               '<div class="gold-divider"></div>' +
-              '<div class="data-row"><div class="data-label">Staff Code</div><div class="data-value" style="font-size:14px; font-family:monospace;">' + staffId + '</div></div>' +
-              '<div class="table-badge">' +
-                '<div class="table-title">Table Assignment</div>' +
-                '<div class="table-number">' + calculatedTable + '</div>' +
-              '</div>';
-
-            resetScanner(6000); 
-          } else {
-            resultDiv.innerHTML = "<h3 style='color:#fc8181;'>Invitation Unrecognized</h3><p style='font-size:13px;'>ID " + staffId + " is not registered on the seating charts.</p>";
-            resetScanner(4000);
-          }
-        }).catch(function(err) {
-          console.error("Camera reset issue: ", err);
-          isProcessing = false;
-        });
-      };
-
-      // Trigger the background JSONP data pipeline request
-      var jsonpUrl = GOOGLE_SCRIPT_URL + "?id=" + encodeURIComponent(staffId) + "&callback=handleGoogleResponse";
-      var script = document.createElement('script');
-      script.id = scriptId;
-      script.src = jsonpUrl;
-      
-      // Error handling to prevent getting permanently stuck if Google takes too long
-      script.onerror = function() {
-        resultDiv.innerHTML = "<h3 style='color:#fc8181;'>Connection Timeout</h3><p style='font-size:13px;'>Could not reach the database script.</p>";
-        resetScanner(4000);
-      };
-      
-      document.body.appendChild(script);
-    }
-
-    function initScanner() {
-      html5QrcodeScanner = new Html5QrcodeScanner("reader", { 
-        fps: 15, 
-        qrbox: { width: 250, height: 250 },
-        rememberLastUsedCamera: true,
-        aspectRatio: 1.0
-      }, false);
-      html5QrcodeScanner.render(onScanSuccess, function(error) {});
-    }
-
-    function resetScanner(delay) {
-      setTimeout(function() {
-        isProcessing = false;
-        var resultDiv = document.getElementById('result');
-        resultDiv.classList.remove('animate-entrance');
-        resultDiv.style.display = 'none';
-        initScanner();
-      }, delay);
-    }
-
-    window.onload = function() {
-      initScanner();
-    };
-  </script>
-</body>
-</html>
+              '<div class="
