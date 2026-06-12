@@ -20,6 +20,7 @@
       color: #ffffff;
       padding: 20px 15px; 
       margin: 0;
+      /* Luxury radial background gradient */
       background-image: 
         radial-gradient(at 50% 0%, rgba(212, 175, 55, 0.12) 0px, transparent 60%),
         radial-gradient(at 0% 100%, rgba(255, 255, 255, 0.02) 0px, transparent 40%);
@@ -46,6 +47,7 @@
       margin-bottom: 25px;
     }
 
+    /* ELEGANT GOLD CAMERA CONTAINER */
     .scanner-container {
       position: relative;
       width: 100%;
@@ -65,6 +67,7 @@
       overflow: hidden;
     }
 
+    /* Standardizing the scanner's internal buttons to fit the elite theme */
     #reader a, #reader button {
       font-family: 'Segoe UI', sans-serif;
       color: #000000 !important;
@@ -80,6 +83,7 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
 
+    /* SHIMMERING GOLD SCAN EFFECT */
     .laser-line {
       position: absolute;
       left: 6px;
@@ -100,6 +104,7 @@
       100% { top: calc(100% - 10px); opacity: 0; }
     }
 
+    /* PRESTIGE VIP RESULT PANEL */
     #result { 
       margin: 30px auto 0 auto; 
       max-width: 340px; 
@@ -107,17 +112,24 @@
       border-radius: 8px; 
       background: var(--panel-bg); 
       border: 1px solid var(--gold-primary);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), inset 0 0 20px rgba(214, 175, 87, 0.05);
       display: none; 
     }
 
+    /* THE LUXURIOUS REVEAL ANIMATION */
     .animate-entrance {
       animation: formalEntrance 0.7s cubic-bezier(0.19, 1, 0.22, 1) both;
     }
 
     @keyframes formalEntrance {
-      0% { transform: translateY(30px) scale(0.96); opacity: 0; }
-      100% { transform: translateY(0) scale(1); opacity: 1; }
+      0% { 
+        transform: translateY(30px) scale(0.96); 
+        opacity: 0;
+      }
+      100% { 
+        transform: translateY(0) scale(1); 
+        opacity: 1;
+      }
     }
 
     .success-header {
@@ -136,6 +148,7 @@
       margin: 15px 0;
     }
 
+    /* Guest Data display spacing */
     .data-row {
       display: flex;
       flex-direction: column;
@@ -158,6 +171,7 @@
       color: #ffffff;
     }
 
+    /* Elegant Table Location Frame */
     .table-badge {
       margin-top: 25px;
       padding: 12px;
@@ -210,7 +224,7 @@
     var html5QrcodeScanner;
     var isProcessing = false;
     
-    // ⚠️ YOUR ACTIVE GOOGLE SCRIPT BACKEND LINK:
+    // ⚠️ YOUR ACTIVE SECURE SCRIPT BACKEND LINK:
     var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxdok04fCs9-zoQmWIq7zqwxknw000XnIwrcKP2R5ZHvD7lJrbVNLtBQedUts52I7MP5Q/exec";
 
     function onScanSuccess(decodedText, decodedResult) {
@@ -220,6 +234,7 @@
       html5QrcodeScanner.clear(); 
       var resultDiv = document.getElementById('result');
       
+      // Reset layout blocks and animations fresh
       resultDiv.classList.remove('animate-entrance');
       resultDiv.style.display = 'block';
       resultDiv.innerHTML = '<div class="success-header" style="color:#a0aec0; letter-spacing:2px;">Verifying Invitation...</div>';
@@ -227,54 +242,55 @@
       var rawText = decodedText.trim();
       var staffId = rawText;
       
-      if (rawText.toUpperCase().startsWith("ID:")) {
-        staffId = rawText.split(":")[1].trim();
+      // Smart QR reader layout: Automatically works whether the QR code reads "ID:HTM001" or just "HTM001"
+      if (rawText.includes(":")) {
+        var partsOfText = rawText.split(":");
+        staffId = partsOfText[partsOfText.length - 1].trim();
       }
       
-      / 🌟 AUTOMATED SECURE FETCH FOR 100+ GUESTS
+      // Clean up past data streams to keep the system fast
       var scriptId = 'google_jsonp_bridge';
       var oldScript = document.getElementById(scriptId);
       if (oldScript) oldScript.parentNode.removeChild(oldScript);
       
-      // Define what to do when Google responds with the guest's data
-      window.handleGoogleResponse = function(responseText) {
-        var parts = responseText.split("|");
+      // 🌟 LIVE INJECTION ENGINE: Decodes data straight out of the sheet rows automatically
+      window.handleGoogleResponse = function(responseString) {
+        var parts = responseString.split("|");
         
         if (parts[0] === "SUCCESS") {
-          var displayName = parts[1];    // Automatically reads Column A
-          var calculatedTable = parts[2]; // Automatically reads Column C
-          var displayOutlet = parts[3];   // Automatically reads Column G
+          var displayName = parts[1];    // Live data from Column A
+          var calculatedTable = parts[2]; // Live data from Column C
+          var displayOutlet = parts[3];   // Live data from Column G
           
           resultDiv.classList.add('animate-entrance');
           resultDiv.innerHTML = 
             '<div class="success-header">✨ Welcome ✨</div>' +
             '<div class="data-row"><div class="data-label">Guest Name</div><div class="data-value" style="color:var(--gold-light); font-weight:bold;">' + displayName + '</div></div>' +
             '<div class="gold-divider"></div>' +
+            
+            // 🌟 ELEGANT OUTLET CARD DISPLAY ROW
             '<div class="data-row"><div class="data-label">Outlet</div><div class="data-value" style="color:#ffffff;">' + displayOutlet + '</div></div>' +
             '<div class="gold-divider"></div>' +
+            
             '<div class="data-row"><div class="data-label">Invitation Code</div><div class="data-value" style="font-size:14px; font-family:monospace;">' + staffId + '</div></div>' +
             '<div class="table-badge">' +
               '<div class="table-title">Table Assignment</div>' +
               '<div class="table-number">' + calculatedTable + '</div>' +
             '</div>';
+
+          resetScanner(6000); // Keeps card on screen for 6 seconds
         } else {
           resultDiv.innerHTML = "<h3 style='color:#fc8181;'>Invitation Unrecognized</h3><p style='font-size:13px;'>ID " + staffId + " is not registered on the seating charts.</p>";
+          resetScanner(4000);
         }
-        resetScanner(6000); 
       };
 
-      // Create a temporary script link to request data without triggering browser security locks
+      // Construct script pipeline query to execute live calculations without CORS freeze blocks
       var jsonpUrl = GOOGLE_SCRIPT_URL + "?id=" + encodeURIComponent(staffId) + "&callback=handleGoogleResponse";
       var script = document.createElement('script');
       script.id = scriptId;
       script.src = jsonpUrl;
       document.body.appendChild(script);
-      })
-      .catch(function(error) {
-        console.error(error);
-        resultDiv.innerHTML = "<h3 style='color:#fc8181;'>System Timeout</h3><p style='font-size:13px;'>Please verify database connectivity.</p>";
-        resetScanner(4000);
-      });
     }
 
     function resetScanner(delay) {
