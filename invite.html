@@ -141,31 +141,30 @@
       var guestId = getUrlParam('id') || "HTM-GUEST";
       document.getElementById('display-id').innerText = guestId.toUpperCase();
 
-      // Fire up the formal design QR builder engine instantly on the attendee's phone
+      // HIGH-RELIABILITY CLASSIC MATRIX BUILDER
+      // We force sharp black squares and square anchors for 0.5-second instant scanning response
       var qrCode = new QRCodeStyling({
         width: 240,
         height: 240,
         type: "svg",
         data: guestId,
         dotsOptions: {
-          color: "#0f1319",     // Rich midnight tone for data dots
-          type: "rounded"       // Elegant smooth rounded design edges
+          color: "#000000",     // Pure flat black for maximum camera contrast
+          type: "square"        // Standard sharp squares so the scanner locks on instantly
         },
         backgroundOptions: {
-          color: "#ffffff",     // Solid white interior background for perfect scan contrast
+          color: "#ffffff",     // Solid white crisp backing box
         },
         cornersSquareOptions: {
-          color: "#aa7c11",     // Dark luxury gold outer corner anchors
-          type: "extra-rounded"
+          color: "#000000",     // Pure black square outer alignment targets
+          type: "square"
         },
         cornersDotOptions: {
-          color: "#d4af37",     // Primary glowing gold inner corner dots
-          type: "dot"
+          color: "#000000",     // Pure black inner tracking spots
+          type: "square"
         }
       });
 
       qrCode.append(document.getElementById("qrcode"));
     };
   </script>
-</body>
-</html>
