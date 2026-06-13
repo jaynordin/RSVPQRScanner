@@ -62,14 +62,10 @@
       background: #000000 !important;
       border-radius: 4px;
       overflow: hidden;
-      /* Removed the scaleX transform from here */
     }
-      /* 🔄 TARGETS ONLY THE VIDEO FEED AND KEEPS TEXT NORMAL */
+    
+    /* 🔄 TARGETS ONLY THE VIDEO FEED AND KEEPS TEXT NORMAL */
     #reader video {
-      transform: scaleX(-1);
-      -webkit-transform: scaleX(-1);
-    }
-      /* 🔄 INSTANT CAMERA HORIZONTAL FLIP FIX */
       transform: scaleX(-1);
       -webkit-transform: scaleX(-1);
     }
@@ -220,32 +216,43 @@
     var html5QrcodeScanner;
     var isProcessing = false;
     
-    // ⚠️ CHOOSE OR PASTE YOUR CURRENT GOOGLE SCRIPT LINK HERE:
     var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxdok04fCs9-zoQmWIq7zqwxknw000XnIwrcKP2R5ZHvD7lJrbVNLtBQedUts52I7MP5Q/exec";
 
-    // 🌟 RE-ENGAGED AUDIO GATEWAY FOR MOBILE TABLETS & PC
+    // 🌟 ULTRA-REALISTIC NEURAL AI VOICE ENGINE
     function speakWelcome() {
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel(); // Drop stuck cues instantly
-        
-        var message = new SpeechSynthesisUtterance("Welcome to HTM Annual Dinner");
-        
-        // Target high fidelity audio packages built natively inside Android/iOS/Windows
-        var voices = window.speechSynthesis.getVoices();
-        for (var i = 0; i < voices.length; i++) {
-          if (voices[i].name.includes("Google US English") || voices[i].name.includes("Natural") || voices[i].lang === "en-US") {
-            message.voice = voices[i];
-            break;
+      try {
+        if ('speechSynthesis' in window) {
+          // Cancel any stuck audio streams instantly
+          window.speechSynthesis.cancel();
+
+          var utterance = new SpeechSynthesisUtterance("Welcome, Honored Guest. Please proceed inside.");
+          
+          // Force system engine to fetch premium neural voices
+          var voices = window.speechSynthesis.getVoices();
+          var premiumVoice = voices.find(function(voice) {
+            return voice.name.includes('Google US English') || 
+                   voice.name.includes('Natural') || 
+                   voice.name.includes('Microsoft Aria') ||
+                   voice.name.includes('Samantha') ||
+                   voice.lang === "en-US";
+          });
+
+          if (premiumVoice) {
+            utterance.voice = premiumVoice;
           }
+
+          // Premium configuration tuning
+          utterance.rate = 0.92;  // Sophisticated pacing
+          utterance.pitch = 1.02; // Warm audio tone
+
+          window.speechSynthesis.speak(utterance);
         }
-        
-        message.rate = 0.90;  
-        message.pitch = 1.0; 
-        window.speechSynthesis.speak(message);
+      } catch (e) {
+        console.error("Neural AI voice generation skipped:", e);
       }
     }
 
-    // Unlocks browser security as soon as an interaction happens on screen
+    // Unlocks browser audio policy parameters on touch interaction
     function unlockAudioEngine() {
       if ('speechSynthesis' in window) {
         var dummyUtterance = new SpeechSynthesisUtterance("");
@@ -283,7 +290,7 @@
             var calculatedTable = parts[2]; 
             var displayOutlet = parts[3];   
             
-            // 🌟 SPEAKS IMMEDIATELY 
+            // Trigger New Real AI Voice Audio Output
             speakWelcome();
             
             resultDiv.classList.add('animate-entrance');
@@ -346,7 +353,6 @@
     window.onload = function() {
       initScanner();
       
-      // Captures the mandatory initial screen tap to unlock the sound engine
       document.body.addEventListener('click', unlockAudioEngine, { once: true });
       document.body.addEventListener('touchstart', unlockAudioEngine, { once: true });
       
