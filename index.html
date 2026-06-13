@@ -218,41 +218,45 @@
     
     var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxdok04fCs9-zoQmWIq7zqwxknw000XnIwrcKP2R5ZHvD7lJrbVNLtBQedUts52I7MP5Q/exec";
 
-    // 🌟 ULTRA-REALISTIC NEURAL AI VOICE ENGINE
-    function speakWelcome() {
+    // 🌟 FULLY DYNAMIC NEURAL AI CONCIERGE ENGINE
+    function speakPersonalizedWelcome(name, table) {
       try {
         if ('speechSynthesis' in window) {
-          // Cancel any stuck audio streams instantly
-          window.speechSynthesis.cancel();
+          window.speechSynthesis.cancel(); // Clears any frozen voices instantly
 
-          var utterance = new SpeechSynthesisUtterance("Welcome, Honored Guest. Please proceed inside.");
+          // Format clean text parameters for natural speaking cadence
+          var cleanName = name.split('(')[0].trim(); // Removes any bracketed notes if present
+          var customSpeechText = "Welcome, " + cleanName + ". Your table assignment is " + table + ". Please enjoy the show.";
           
-          // Force system engine to fetch premium neural voices
+          var utterance = new SpeechSynthesisUtterance(customSpeechText);
+          
+          // Access advanced native platform audio assets
           var voices = window.speechSynthesis.getVoices();
-          var premiumVoice = voices.find(function(voice) {
-            return voice.name.includes('Google US English') || 
-                   voice.name.includes('Natural') || 
-                   voice.name.includes('Microsoft Aria') ||
-                   voice.name.includes('Samantha') ||
-                   voice.lang === "en-US";
+          
+          // Filter out robotic voices, prioritizing rich, expressive accents
+          var premiumVoice = voices.find(function(v) {
+            return v.name.includes('Premium') || 
+                   v.name.includes('Natural') || 
+                   v.name.includes('Google US English') || 
+                   v.name.includes('Samantha') || 
+                   v.name.includes('Aria');
           });
 
           if (premiumVoice) {
             utterance.voice = premiumVoice;
           }
 
-          // Premium configuration tuning
-          utterance.rate = 0.92;  // Sophisticated pacing
-          utterance.pitch = 1.02; // Warm audio tone
+          // Elegant, clear hospitality cadence configurations
+          utterance.rate = 0.88;  // Elegant pacing so table names are fully clear
+          utterance.pitch = 1.02; // Sophisticated and inviting tone
 
           window.speechSynthesis.speak(utterance);
         }
       } catch (e) {
-        console.error("Neural AI voice generation skipped:", e);
+        console.error("Personalized audio processing bypass:", e);
       }
     }
 
-    // Unlocks browser audio policy parameters on touch interaction
     function unlockAudioEngine() {
       if ('speechSynthesis' in window) {
         var dummyUtterance = new SpeechSynthesisUtterance("");
@@ -290,8 +294,8 @@
             var calculatedTable = parts[2]; 
             var displayOutlet = parts[3];   
             
-            // Trigger New Real AI Voice Audio Output
-            speakWelcome();
+            // 🎙️ TRIPPED INSTANTLY: Passing real database variables into the speech engine
+            speakPersonalizedWelcome(displayName, calculatedTable);
             
             resultDiv.classList.add('animate-entrance');
             resultDiv.innerHTML = 
@@ -306,7 +310,7 @@
                 '<div class="table-number">' + calculatedTable + '</div>' +
               '</div>';
 
-            resetScanner(6000); 
+            resetScanner(7000); // 7 seconds delay to let the longer sentence finish speaking smoothly
           } else {
             resultDiv.innerHTML = "<h3 style='color:#fc8181;'>Invitation Unrecognized</h3><p style='font-size:13px;'>ID " + staffId + " is not registered on the seating charts.</p>";
             resetScanner(4000);
