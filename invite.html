@@ -107,6 +107,29 @@
       border-top: 1px solid rgba(214, 175, 87, 0.2);
       padding-top: 15px;
     }
+
+    /* ✨ SLEEK GOLD SAVE PASS BUTTON STYLING */
+    .download-btn {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, var(--gold-light), var(--gold-primary));
+      color: #0d0f12;
+      border: none;
+      border-radius: 6px;
+      padding: 12px 24px;
+      font-size: 13px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      width: 100%;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+      transition: all 0.2s ease;
+    }
+
+    .download-btn:active {
+      transform: scale(0.98);
+      box-shadow: 0 2px 5px rgba(212, 175, 55, 0.1);
+    }
   </style>
 </head>
 <body>
@@ -126,6 +149,10 @@
 
     <div class="footer-note">
       Please present this digital pass at the entrance concierge for rapid seating verification.
+    </div>
+
+    <div style="margin-top: 25px;">
+      <button id="download-pass-btn" class="download-btn">Save Pass to Phone</button>
     </div>
   </div>
 
@@ -166,5 +193,15 @@
       });
 
       qrCode.append(document.getElementById("qrcode"));
+
+      // 📥 ATTACH THE DIRECT PNG DOWNLOAD EXECUTION
+      document.getElementById("download-pass-btn").addEventListener("click", function() {
+        qrCode.download({ 
+          name: "HTM_Pass_" + guestId.toUpperCase(), 
+          extension: "png" 
+        });
+      });
     };
   </script>
+</body>
+</html>
