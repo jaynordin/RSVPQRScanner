@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Your Digital Invitation - HTM Annual Dinner</title>
   <script src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  
   <style>
     :root {
       --gold-primary: #d4af37;
@@ -20,6 +22,7 @@
       margin: 0;
       padding: 0;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
@@ -32,10 +35,19 @@
       background-attachment: fixed;
     }
 
-    .ticket-card {
+    /* Wrap the card so the button stays visible but outside the captured area if needed */
+    .card-wrapper {
       width: 90%;
       max-width: 380px;
-      background: rgba(22, 26, 33, 0.95);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .ticket-card {
+      width: 100%;
+      box-sizing: border-box;
+      background: #161a21; /* Solid dark color for perfect image conversion */
       border: 1px solid var(--gold-primary);
       border-radius: 12px;
       padding: 35px 25px;
@@ -115,12 +127,13 @@
       color: #0d0f12;
       border: none;
       border-radius: 6px;
-      padding: 12px 24px;
+      padding: 14px 24px;
       font-size: 13px;
       font-weight: bold;
       text-transform: uppercase;
       letter-spacing: 1.5px;
       width: 100%;
+      margin-top: 20px;
       cursor: pointer;
       box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
       transition: all 0.2s ease;
@@ -128,77 +141,87 @@
 
     .download-btn:active {
       transform: scale(0.98);
-      box-shadow: 0 2px 5px rgba(212, 175, 55, 0.1);
     }
   </style>
 </head>
 <body>
 
-  <div class="ticket-card">
-    <h2>HTM Annual Dinner</h2>
-    <div class="subtitle">Official Admission Pass</div>
+  <div class="card-wrapper">
+    <div class="ticket-card" id="my-ticket">
+      <h2>HTM Annual Dinner</h2>
+      <div class="subtitle">Official Admission Pass</div>
 
-    <div class="qr-frame">
-      <div id="qrcode"></div>
+      <div class="qr-frame">
+        <div id="qrcode"></div>
+      </div>
+
+      <div class="guest-info">
+        <div class="label">Guest Code</div>
+        <div id="display-id" class="value" style="font-family: monospace; letter-spacing: 1px;">-</div>
+      </div>
+
+      <div class="footer-note">
+        Please present this digital pass at the entrance concierge for rapid seating verification.
+      </div>
     </div>
 
-    <div class="guest-info">
-      <div class="label">Guest Code</div>
-      <div id="display-id" class="value" style="font-family: monospace; letter-spacing: 1px;">-</div>
-    </div>
-
-    <div class="footer-note">
-      Please present this digital pass at the entrance concierge for rapid seating verification.
-    </div>
-
-    <div style="margin-top: 25px;">
-      <button id="download-pass-btn" class="download-btn">Save Pass to Phone</button>
-    </div>
+    <button id="download-pass-btn" class="download-btn">Save Pass to Phone</button>
   </div>
 
   <script>
-    // Automatically parse the URL parameters sent from the WhatsApp link
     function getUrlParam(paramName) {
       var params = new URLSearchParams(window.location.search);
       return params.get(paramName);
     }
 
     window.onload = function() {
-      // Extract the guest ID directly from the URL link
       var guestId = getUrlParam('id') || "HTM-GUEST";
       document.getElementById('display-id').innerText = guestId.toUpperCase();
 
-      // HIGH-RELIABILITY CLASSIC MATRIX BUILDER
-      // We force sharp black squares and square anchors for 0.5-second instant scanning response
       var qrCode = new QRCodeStyling({
         width: 240,
         height: 240,
         type: "svg",
         data: guestId,
         dotsOptions: {
-          color: "#000000",     // Pure flat black for maximum camera contrast
-          type: "square"        // Standard sharp squares so the scanner locks on instantly
+          color: "#000000",
+          type: "square"
         },
         backgroundOptions: {
-          color: "#ffffff",     // Solid white crisp backing box
+          color: "#ffffff",
         },
         cornersSquareOptions: {
-          color: "#000000",     // Pure black square outer alignment targets
+          color: "#000000",
           type: "square"
         },
         cornersDotOptions: {
-          color: "#000000",     // Pure black inner tracking spots
+          color: "#000000",
           type: "square"
         }
       });
 
       qrCode.append(document.getElementById("qrcode"));
 
-      // 📥 ATTACH THE DIRECT PNG DOWNLOAD EXECUTION
+      // 📥 SCREENSHOT ENGINE EXECUTION
       document.getElementById("download-pass-btn").addEventListener("click", function() {
-        qrCode.download({ 
-          name: "HTM_Pass_" + guestId.toUpperCase(), 
-          extension: "png" 
+        var ticketElement = document.getElementById("my-ticket");
+        
+        // Take a high-resolution snapshot of the card panel element
+        html2canvas(ticketElement, {
+          scale: 3,             // Enhances clarity so it looks crisp on high-end smartphone screens
+          useCORS: true,        // Safely processes elements
+          backgroundColor: null // Keeps background corners perfectly rounded
+        }).then(function(canvas) {
+          // Convert the snapshot result into a standard downloadable PNG image file string
+          var imagePath = canvas.toDataURL("image/png");
+          
+          var downloadLink = document.createElement("a");
+          downloadLink.download = "HTM_Dinner_Pass_" + guestId.toUpperCase() + ".png";
+          downloadLink.href = imagePath;
+          
+          document.body.appendChild(downloadLink);
+          downloadLink.click();
+          document.body.removeChild(downloadLink);
         });
       });
     };
