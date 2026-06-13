@@ -62,7 +62,13 @@
       background: #000000 !important;
       border-radius: 4px;
       overflow: hidden;
-      
+      /* Removed the scaleX transform from here */
+    }
+      /* 🔄 TARGETS ONLY THE VIDEO FEED AND KEEPS TEXT NORMAL */
+    #reader video {
+      transform: scaleX(-1);
+      -webkit-transform: scaleX(-1);
+    }
       /* 🔄 INSTANT CAMERA HORIZONTAL FLIP FIX */
       transform: scaleX(-1);
       -webkit-transform: scaleX(-1);
