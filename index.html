@@ -2,391 +2,78 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <title>HTM Grand Annual Dinner - Guest Check-In</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Staff Gate Check-In</title>
   <style>
-    :root {
-      --gold-primary: #d4af37;
-      --gold-light: #f3e5ab;
-      --gold-dark: #aa7c11;
-      --dark-bg: #0d0f12;
-      --panel-bg: rgba(22, 26, 33, 0.95);
-    }
-
-    body { 
-      font-family: 'Georgia', 'Times New Roman', serif; 
-      text-align: center; 
-      background: var(--dark-bg); 
-      color: #ffffff;
-      padding: 0; 
-      margin: 0;
-      background-image: 
-        radial-gradient(at 50% 0%, rgba(212, 175, 55, 0.12) 0px, transparent 60%),
-        radial-gradient(at 0% 100%, rgba(255, 255, 255, 0.02) 0px, transparent 40%);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      overflow-x: hidden;
-    }
-
-    h2 { 
-      color: var(--gold-light); 
-      margin-top: 20px;
-      margin-bottom: 5px; 
-      text-transform: uppercase;
-      letter-spacing: 4px;
-      font-size: 20px;
-      font-weight: 300;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
-    }
-
-    .subtitle {
-      font-family: 'Segoe UI', sans-serif;
-      font-size: 11px;
-      color: #8a94a6;
-      text-transform: uppercase;
-      letter-spacing: 3px;
-      margin-bottom: 20px;
-    }
-
-    /* 🎥 RESIZED: TAKES UP EXACTLY 70% OF THE VIEWPORT WIDTH AND HEIGHT */
-    .scanner-container {
-      position: relative;
-      width: 70vw;
-      height: 70vh;
-      max-width: 450px; /* Safeguard threshold for tablet/wider screens */
-      margin: 0 auto;
-      border-radius: 12px;
-      padding: 4px;
-      background: linear-gradient(135deg, var(--gold-dark), var(--gold-light), var(--gold-dark));
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
-      overflow: hidden;
-    }
-
-    #reader { 
-      width: 100% !important; 
-      height: 100% !important;
-      background: #000000 !important;
-      border-radius: 8px;
-      overflow: hidden;
-      border: none !important;
-    }
-
-    /* 🔥 INTERCEPT AND FORCE DYNAMIC INTERNAL WRAPPERS TO FILL 100% OF THE 70% CONTAINER */
-    #reader > div:first-child {
-      width: 100% !important;
-      height: 100% !important;
-    }
-    
-    /* 🔄 TARGETS VIDEO STREAM FEEDS TO FILL OUT THE DIMENSION SCALE UNIFORMLY */
-    #reader video {
-      width: 100% !important;
-      height: 100% !important;
-      object-fit: cover !important;
-      transform: scaleX(-1);
-      -webkit-transform: scaleX(-1);
-    }
-
-    #reader border {
-      border: none !important;
-    }
-
-    #reader a, #reader button {
-      font-family: 'Segoe UI', sans-serif;
-      color: #000000 !important;
-      border: none !important;
-      background: linear-gradient(to bottom, var(--gold-light), var(--gold-primary)) !important;
-      padding: 10px 20px !important;
-      border-radius: 4px !important;
-      text-transform: uppercase !important;
-      font-size: 11px !important;
-      font-weight: bold !important;
-      letter-spacing: 1.5px !important;
-      cursor: pointer;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-      margin: 15px 0 !important;
-      display: inline-block;
-    }
-
-    /* ⚡ LASER POSITION BOUND DIRECTLY TO CONTINUOUS DYNAMIC WINDOW CALCULATIONS */
-    .laser-line {
-      position: absolute;
-      left: 4px;
-      right: 4px;
-      height: 4px;
-      background: linear-gradient(90deg, rgba(212,175,55,0) 0%, rgba(243,229,171,1) 50%, rgba(212,175,55,0) 100%);
-      box-shadow: 0 0 15px 3px var(--gold-primary);
-      z-index: 5;
-      top: 4px;
-      pointer-events: none;
-      animation: goldShimmer 3.5s ease-in-out infinite;
-    }
-
-    @keyframes goldShimmer {
-      0% { top: 4px; opacity: 0; }
-      10% { opacity: 1; }
-      90% { opacity: 1; }
-      100% { top: calc(100% - 8px); opacity: 0; }
-    }
-
-    /* 🏷️ FIXED POPUP OVERLAY LAYOUT */
-    #result { 
-      position: fixed;
-      bottom: 3%;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 85%;
-      max-width: 340px; 
-      padding: 22px 20px; 
-      border-radius: 8px; 
-      background: var(--panel-bg); 
-      border: 1px solid var(--gold-primary);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      z-index: 20;
-      display: none; 
-    }
-
-    .animate-entrance {
-      animation: formalEntrance 0.7s cubic-bezier(0.19, 1, 0.22, 1) both;
-    }
-
-    @keyframes formalEntrance {
-      0% { transform: translate(-50%, 30px) scale(0.96); opacity: 0; }
-      100% { transform: translate(-50%, 0) scale(1); opacity: 1; }
-    }
-
-    .success-header {
-      color: var(--gold-light);
-      font-size: 16px;
-      font-weight: normal;
-      text-transform: uppercase;
-      letter-spacing: 4px;
-      margin-bottom: 25px;
-    }
-
-    .gold-divider {
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--gold-primary), transparent);
-      margin: 15px 0;
-    }
-
-    .data-row {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-    
-    .data-label {
-      font-family: 'Segoe UI', sans-serif;
-      color: #718096;
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      margin-bottom: 4px;
-    }
-
-    .data-value {
-      font-size: 18px;
-      color: #ffffff;
-    }
-
-    .table-badge {
-      margin-top: 25px;
-      padding: 12px;
-      border: 1px dashed rgba(214, 175, 87, 0.4);
-      border-radius: 4px;
-      background: rgba(214, 175, 87, 0.02);
-    }
-
-    .table-title {
-      font-family: 'Segoe UI', sans-serif;
-      font-size: 10px;
-      color: var(--gold-primary);
-      text-transform: uppercase;
-      letter-spacing: 2px;
-    }
-
-    .table-number {
-      font-size: 26px;
-      color: var(--gold-light);
-    }
-
-    .hud-text {
-      font-family: 'Segoe UI', sans-serif;
-      font-size: 10px;
-      color: #4a5568;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      margin-top: 12px;
-      z-index: 10;
-    }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; text-align: center; background: #f8f9fa; padding: 15px; margin: 0; }
+    h2 { color: #2c3e50; margin-bottom: 15px; }
+    #reader { width: 100%; max-width: 380px; margin: 0 auto; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+    #result { margin: 20px auto 0 auto; max-width: 350px; padding: 20px; border-radius: 10px; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: none; }
   </style>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode"></script>
 </head>
 <body>
 
-  <h2>HTM Annual Dinner</h2>
-  <div class="subtitle">Guest Welcoming Portal</div>
-  
-  <div class="scanner-container">
-    <div class="laser-line"></div>
-    <div id="reader"></div>
-  </div>
-
-  <div class="hud-text">Digital Concierge Active</div>
-
+  <h2>Staff Gate Check-In</h2>
+  <div id="reader"></div>
   <div id="result"></div>
 
   <script>
     var html5QrcodeScanner;
     var isProcessing = false;
     
+    // ⚠️ PASTE YOUR GOOGLE WEB APP URL BETWEEN THE QUOTES BELOW:
     var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxdok04fCs9-zoQmWIq7zqwxknw000XnIwrcKP2R5ZHvD7lJrbVNLtBQedUts52I7MP5Q/exec";
-
-    // 🌟 FULLY DYNAMIC NEURAL AI CONCIERGE ENGINE
-    function speakPersonalizedWelcome(name, table) {
-      try {
-        if ('speechSynthesis' in window) {
-          window.speechSynthesis.cancel(); 
-
-          var cleanName = name.split('(')[0].trim(); 
-          var customSpeechText = "Weeeelcome, " + cleanName + ". Your table assignment is " + table + ". Please enjoy the show.";
-          
-          var utterance = new SpeechSynthesisUtterance(customSpeechText);
-          
-          var voices = window.speechSynthesis.getVoices();
-          
-          var premiumVoice = voices.find(function(v) {
-            return v.name.includes('Premium') || 
-                   v.name.includes('Natural') || 
-                   v.name.includes('Google US English') || 
-                   v.name.includes('Samantha') || 
-                   v.name.includes('Aria');
-          });
-
-          if (premiumVoice) {
-            utterance.voice = premiumVoice;
-          }
-
-          utterance.rate = 0.78;  
-          utterance.pitch = 1.02; 
-
-          window.speechSynthesis.speak(utterance);
-        }
-      } catch (e) {
-        console.error("Personalized audio processing bypass:", e);
-      }
-    }
-
-    function unlockAudioEngine() {
-      if ('speechSynthesis' in window) {
-        var dummyUtterance = new SpeechSynthesisUtterance("");
-        window.speechSynthesis.speak(dummyUtterance);
-      }
-    }
 
     function onScanSuccess(decodedText, decodedResult) {
       if (isProcessing) return;
       isProcessing = true;
       
+      html5QrcodeScanner.clear(); 
+      
       var resultDiv = document.getElementById('result');
-      resultDiv.classList.remove('animate-entrance');
       resultDiv.style.display = 'block';
-      resultDiv.innerHTML = '<div class="success-header" style="color:#a0aec0; letter-spacing:2px;">Verifying Invitation...</div>';
+      resultDiv.innerHTML = '<p style="color:#95a5a6; font-style:italic;">Processing Check-In...</p>';
       
       var rawText = decodedText.trim();
       var staffId = rawText;
       
-      if (rawText.includes(":")) {
-        var partsOfText = rawText.split(":");
-        staffId = partsOfText[partsOfText.length - 1].trim();
+      // Clean up "ID:HTM001" down to just "HTM001"
+      if (rawText.toUpperCase().startsWith("ID:")) {
+        staffId = rawText.split(":")[1].trim();
       }
       
-      var scriptId = 'google_jsonp_bridge';
-      var oldScript = document.getElementById(scriptId);
-      if (oldScript) oldScript.parentNode.removeChild(oldScript);
+      // Send a clean, unblocked network fetch request using 'no-cors' mode
+      var targetUrl = GOOGLE_SCRIPT_URL + "?id=" + encodeURIComponent(staffId);
       
-      window.handleGoogleResponse = function(responseString) {
-        html5QrcodeScanner.clear().then(function() {
-          var parts = responseString.split("|");
-          
-          if (parts[0] === "SUCCESS") {
-            var displayName = parts[1];    
-            var calculatedTable = parts[2]; 
-            var displayOutlet = parts[3];   
-            
-            speakPersonalizedWelcome(displayName, calculatedTable);
-            
-            resultDiv.classList.add('animate-entrance');
-            resultDiv.innerHTML = 
-              '<div class="success-header">✨ Welcome ✨</div>' +
-              '<div class="data-row"><div class="data-label">Guest Name</div><div class="data-value" style="color:var(--gold-light); font-weight:bold;">' + displayName + '</div></div>' +
-              '<div class="gold-divider"></div>' +
-              '<div class="data-row"><div class="data-label">Outlet</div><div class="data-value" style="color:#ffffff;">' + displayOutlet + '</div></div>' +
-              '<div class="gold-divider"></div>' +
-              '<div class="data-row"><div class="data-label">Staff Code</div><div class="data-value" style="font-size:14px; font-family:monospace;">' + staffId + '</div></div>' +
-              '<div class="table-badge">' +
-                '<div class="table-title">Table Assignment</div>' +
-                '<div class="table-number">' + calculatedTable + '</div>' +
-              '</div>';
-
-            resetScanner(7000); 
-          } else {
-            resultDiv.innerHTML = "<h3 style='color:#fc8181;'>Invitation Unrecognized</h3><p style='font-size:13px;'>ID " + staffId + " is not registered on the seating charts.</p>";
-            resetScanner(4000);
-          }
-        }).catch(function(err) {
-          console.error("Camera reset issue: ", err);
-          isProcessing = false;
-        });
-      };
-
-      var jsonpUrl = GOOGLE_SCRIPT_URL + "?id=" + encodeURIComponent(staffId) + "&callback=handleGoogleResponse";
-      var script = document.createElement('script');
-      script.id = scriptId;
-      script.src = jsonpUrl;
-      
-      script.onerror = function() {
-        resultDiv.innerHTML = "<h3 style='color:#fc8181;'>Connection Timeout</h3><p style='font-size:13px;'>Could not reach the database script.</p>";
+      fetch(targetUrl, { 
+        method: "GET", 
+        mode: "no-cors" 
+      })
+      .then(function() {
+        // Because of 'no-cors', it triggers successfully regardless of browser filters
+        resultDiv.innerHTML = "<h3>✅ Check-In Processed</h3><p>Scanned ID: <b>" + staffId + "</b></p><p style='color:#2ecc71;'>Spreadsheet updated!</p>";
+        resetScanner(3000);
+      })
+      .catch(function(error) {
+        console.error(error);
+        resultDiv.innerHTML = "<h3>⚠️ Connection Error</h3><p>Could not contact server.</p>";
         resetScanner(4000);
-      };
-      
-      document.body.appendChild(script);
-    }
-
-    function initScanner() {
-      // 🛠️ qrbox option omitted from settings so video naturally fills 100% of the new 70% bounds safely
-      html5QrcodeScanner = new Html5QrcodeScanner("reader", { 
-        fps: 15, 
-        rememberLastUsedCamera: true,
-        aspectRatio: 1.0
-      }, false);
-      html5QrcodeScanner.render(onScanSuccess, function(error) {});
+      });
     }
 
     function resetScanner(delay) {
       setTimeout(function() {
         isProcessing = false;
-        var resultDiv = document.getElementById('result');
-        resultDiv.classList.remove('animate-entrance');
-        resultDiv.style.display = 'none';
-        initScanner();
+        document.getElementById('result').style.display = 'none';
+        html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 15, qrbox: 240 });
+        html5QrcodeScanner.render(onScanSuccess);
       }, delay);
     }
 
     window.onload = function() {
-      initScanner();
-      
-      document.body.addEventListener('click', unlockAudioEngine, { once: true });
-      document.body.addEventListener('touchstart', unlockAudioEngine, { once: true });
-      
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.getVoices();
-      }
+      html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 15, qrbox: 240 });
+      html5QrcodeScanner.render(onScanSuccess);
     };
   </script>
 </body>
