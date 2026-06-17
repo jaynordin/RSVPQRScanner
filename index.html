@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <title>HTM Grand Annual Dinner - Guest Check-In</title>
   <style>
     :root {
@@ -10,7 +10,7 @@
       --gold-light: #f3e5ab;
       --gold-dark: #aa7c11;
       --dark-bg: #0d0f12;
-      --panel-bg: rgba(22, 26, 33, 0.95);
+      --panel-bg: rgba(22, 26, 33, 0.90);
     }
 
     body { 
@@ -18,23 +18,30 @@
       text-align: center; 
       background: var(--dark-bg); 
       color: #ffffff;
-      padding: 20px 15px; 
       margin: 0;
-      background-image: 
-        radial-gradient(at 50% 0%, rgba(212, 175, 55, 0.12) 0px, transparent 60%),
-        radial-gradient(at 0% 100%, rgba(255, 255, 255, 0.02) 0px, transparent 40%);
+      padding: 0;
       min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* 🏛️ FLOATING HEADER CONTROLS */
+    .header-overlay {
+      position: relative;
+      z-index: 10;
+      padding-top: 25px;
+      padding-bottom: 10px;
+      background: linear-gradient(to bottom, rgba(13, 15, 18, 0.9) 0%, rgba(13, 15, 18, 0.4) 70%, transparent 100%);
+      pointer-events: none; /* Allows user to click through header to hit scanner buttons if overlapping */
     }
 
     h2 { 
       color: var(--gold-light); 
-      margin-top: 10px;
-      margin-bottom: 5px; 
+      margin: 0 0 5px 0; 
       text-transform: uppercase;
       letter-spacing: 4px;
-      font-size: 20px;
+      font-size: 22px;
       font-weight: 300;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+      text-shadow: 0 3px 6px rgba(0, 0, 0, 0.9);
     }
 
     .subtitle {
@@ -43,35 +50,41 @@
       color: #8a94a6;
       text-transform: uppercase;
       letter-spacing: 3px;
-      margin-bottom: 25px;
+      margin: 0;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
     }
 
+    /* 🎥 FULL SCREEN IMMERSIVE CAMERA CONTAINER */
     .scanner-container {
-      position: relative;
-      width: 100%;
-      max-width: 360px;
-      margin: 0 auto;
-      border-radius: 8px;
-      padding: 6px;
-      background: linear-gradient(135deg, var(--gold-dark), var(--gold-light), var(--gold-dark));
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      background: #000;
     }
 
     #reader { 
       width: 100% !important; 
+      height: 100% !important;
       background: #000000 !important;
-      border-radius: 4px;
-      overflow: hidden;
+      border: none !important;
     }
     
-    /* 🔄 TARGETS ONLY THE VIDEO FEED AND KEEPS TEXT NORMAL */
+    /* Forces the native HTML video asset to object-fit fill the viewport screen boundary */
     #reader video {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover !important;
       transform: scaleX(-1);
       -webkit-transform: scaleX(-1);
     }
 
-    #reader border {
-      border: none !important;
+    /* Clears native library dashboard layouts to keep ui minimalist */
+    #reader __dashboard {
+      padding-left: 10px !important;
+      padding-right: 10px !important;
     }
 
     #reader a, #reader button {
@@ -79,55 +92,66 @@
       color: #000000 !important;
       border: none !important;
       background: linear-gradient(to bottom, var(--gold-light), var(--gold-primary)) !important;
-      padding: 10px 20px !important;
+      padding: 12px 24px !important;
       border-radius: 4px !important;
       text-transform: uppercase !important;
-      font-size: 11px !important;
+      font-size: 12px !important;
       font-weight: bold !important;
       letter-spacing: 1.5px !important;
       cursor: pointer;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-      margin: 10px 0 !important;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.5);
+      margin: 15px auto !important;
+      display: inline-block;
+      pointer-events: auto; /* Makes button clickable over overlays */
     }
 
+    /* ⚡ CINEMATIC HORIZONTAL SCANNING RADAR LINE */
     .laser-line {
       position: absolute;
-      left: 6px;
-      right: 6px;
+      left: 0;
+      right: 0;
       height: 4px;
       background: linear-gradient(90deg, rgba(212,175,55,0) 0%, rgba(243,229,171,1) 50%, rgba(212,175,55,0) 100%);
-      box-shadow: 0 0 15px 3px var(--gold-primary);
+      box-shadow: 0 0 20px 4px var(--gold-primary);
       z-index: 5;
-      top: 6px;
+      top: 0;
       pointer-events: none;
-      animation: goldShimmer 3.5s ease-in-out infinite;
+      animation: fullScreenLaser 4s ease-in-out infinite;
     }
 
-    @keyframes goldShimmer {
-      0% { top: 6px; opacity: 0; }
+    @keyframes fullScreenLaser {
+      0% { top: 0%; opacity: 0; }
       10% { opacity: 1; }
       90% { opacity: 1; }
-      100% { top: calc(100% - 10px); opacity: 0; }
+      100% { top: 100%; opacity: 0; }
     }
 
+    /* 🏷️ FLOATING GUEST RESULT CARD PANEL */
     #result { 
-      margin: 30px auto 0 auto; 
-      max-width: 340px; 
-      padding: 30px 25px; 
-      border-radius: 8px; 
+      position: fixed;
+      bottom: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 85%;
+      max-width: 350px; 
+      padding: 25px 20px; 
+      border-radius: 12px; 
       background: var(--panel-bg); 
       border: 1px solid var(--gold-primary);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px); /* Elegant blur context over camera stream layer */
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 10;
       display: none; 
     }
 
     .animate-entrance {
-      animation: formalEntrance 0.7s cubic-bezier(0.19, 1, 0.22, 1) both;
+      animation: formalEntrance 0.5s cubic-bezier(0.19, 1, 0.22, 1) both;
     }
 
     @keyframes formalEntrance {
-      0% { transform: translateY(30px) scale(0.96); opacity: 0; }
-      100% { transform: translateY(0) scale(1); opacity: 1; }
+      0% { transform: translate(-50%, 40px) scale(0.95); opacity: 0; }
+      100% { transform: translate(-50%, 0) scale(1); opacity: 1; }
     }
 
     .success-header {
@@ -136,29 +160,29 @@
       font-weight: normal;
       text-transform: uppercase;
       letter-spacing: 4px;
-      margin-bottom: 25px;
+      margin-bottom: 20px;
     }
 
     .gold-divider {
       height: 1px;
       background: linear-gradient(90deg, transparent, var(--gold-primary), transparent);
-      margin: 15px 0;
+      margin: 12px 0;
     }
 
     .data-row {
       display: flex;
       flex-direction: column;
       align-items: center;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
     }
     
     .data-label {
       font-family: 'Segoe UI', sans-serif;
-      color: #718096;
+      color: #a0aec0;
       font-size: 10px;
       text-transform: uppercase;
       letter-spacing: 2px;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
 
     .data-value {
@@ -167,11 +191,11 @@
     }
 
     .table-badge {
-      margin-top: 25px;
-      padding: 12px;
+      margin-top: 18px;
+      padding: 10px;
       border: 1px dashed rgba(214, 175, 87, 0.4);
       border-radius: 4px;
-      background: rgba(214, 175, 87, 0.02);
+      background: rgba(214, 175, 87, 0.05);
     }
 
     .table-title {
@@ -183,32 +207,40 @@
     }
 
     .table-number {
-      font-size: 26px;
+      font-size: 28px;
       color: var(--gold-light);
+      font-weight: bold;
     }
 
     .hud-text {
+      position: fixed;
+      top: 90px;
+      left: 0;
+      width: 100%;
       font-family: 'Segoe UI', sans-serif;
       font-size: 10px;
-      color: #4a5568;
-      letter-spacing: 1.5px;
+      color: rgba(255, 255, 255, 0.4);
+      letter-spacing: 2px;
       text-transform: uppercase;
-      margin-top: 12px;
+      z-index: 10;
+      pointer-events: none;
     }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 </head>
 <body>
 
-  <h2>HTM Annual Dinner</h2>
-  <div class="subtitle">Guest Welcoming Portal</div>
+  <div class="header-overlay">
+    <h2>HTM Annual Dinner</h2>
+    <div class="subtitle">Guest Welcoming Portal</div>
+  </div>
   
+  <div class="hud-text">Digital Concierge Active</div>
+
   <div class="scanner-container">
     <div class="laser-line"></div>
     <div id="reader"></div>
   </div>
-
-  <div class="hud-text">Digital Concierge Active</div>
 
   <div id="result"></div>
 
@@ -218,22 +250,17 @@
     
     var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxdok04fCs9-zoQmWIq7zqwxknw000XnIwrcKP2R5ZHvD7lJrbVNLtBQedUts52I7MP5Q/exec";
 
-    // 🌟 FULLY DYNAMIC NEURAL AI CONCIERGE ENGINE
     function speakPersonalizedWelcome(name, table) {
       try {
         if ('speechSynthesis' in window) {
-          window.speechSynthesis.cancel(); // Clears any frozen voices instantly
+          window.speechSynthesis.cancel(); 
 
-          // Format clean text parameters for natural speaking cadence
-          var cleanName = name.split('(')[0].trim(); // Removes any bracketed notes if present
+          var cleanName = name.split('(')[0].trim(); 
           var customSpeechText = "Weeeelcome, " + cleanName + ". Your table assignment is " + table + ". Please enjoy the show.";
           
           var utterance = new SpeechSynthesisUtterance(customSpeechText);
-          
-          // Access advanced native platform audio assets
           var voices = window.speechSynthesis.getVoices();
           
-          // Filter out robotic voices, prioritizing rich, expressive accents
           var premiumVoice = voices.find(function(v) {
             return v.name.includes('Premium') || 
                    v.name.includes('Natural') || 
@@ -246,9 +273,8 @@
             utterance.voice = premiumVoice;
           }
 
-          // Elegant, clear hospitality cadence configurations
-          utterance.rate = 0.78;  // Elegant pacing so table names are fully clear
-          utterance.pitch = 1.02; // Sophisticated and inviting tone
+          utterance.rate = 0.78;  
+          utterance.pitch = 1.02; 
 
           window.speechSynthesis.speak(utterance);
         }
@@ -294,7 +320,6 @@
             var calculatedTable = parts[2]; 
             var displayOutlet = parts[3];   
             
-            // 🎙️ TRIPPED INSTANTLY: Passing real database variables into the speech engine
             speakPersonalizedWelcome(displayName, calculatedTable);
             
             resultDiv.classList.add('animate-entrance');
@@ -310,9 +335,10 @@
                 '<div class="table-number">' + calculatedTable + '</div>' +
               '</div>';
 
-            resetScanner(7000); // 7 seconds delay to let the longer sentence finish speaking smoothly
+            resetScanner(7000); 
           } else {
-            resultDiv.innerHTML = "<h3 style='color:#fc8181;'>Invitation Unrecognized</h3><p style='font-size:13px;'>ID " + staffId + " is not registered on the seating charts.</p>";
+            resultDiv.classList.add('animate-entrance');
+            resultDiv.innerHTML = "<h3 style='color:#fc8181; margin-top:0;'>Invitation Unrecognized</h3><p style='font-size:13px; margin-bottom:0;'>ID " + staffId + " is not registered on the seating charts.</p>";
             resetScanner(4000);
           }
         }).catch(function(err) {
@@ -327,7 +353,8 @@
       script.src = jsonpUrl;
       
       script.onerror = function() {
-        resultDiv.innerHTML = "<h3 style='color:#fc8181;'>Connection Timeout</h3><p style='font-size:13px;'>Could not reach the database script.</p>";
+        resultDiv.classList.add('animate-entrance');
+        resultDiv.innerHTML = "<h3 style='color:#fc8181; margin-top:0;'>Connection Timeout</h3><p style='font-size:13px; margin-bottom:0;'>Could not reach the database script.</p>";
         resetScanner(4000);
       };
       
@@ -335,11 +362,11 @@
     }
 
     function initScanner() {
+      // 🛠️ Modified configuration parameters to eliminate restrictive framing bounding rules
       html5QrcodeScanner = new Html5QrcodeScanner("reader", { 
-        fps: 15, 
-        qrbox: { width: 250, height: 250 },
+        fps: 24, 
         rememberLastUsedCamera: true,
-        aspectRatio: 1.0
+        supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA]
       }, false);
       html5QrcodeScanner.render(onScanSuccess, function(error) {});
     }
