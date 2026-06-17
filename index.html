@@ -55,12 +55,12 @@
       margin: 0;
     }
 
-    /* 🎥 FORCED CAMERA CONTAINER DIMENSIONS */
+    /* 🎥 FORCED CAMERA CONTAINER DIMENSIONS (70% VIEWPORT WIDTH AND HEIGHT) */
     .scanner-container {
       position: relative;
       width: 70vw;
       height: 70vh;
-      max-width: 500px;
+      max-width: 500px; /* Prevents stretching too wide on wide screens */
       z-index: 1;
       background: #000000;
       border-radius: 12px;
@@ -69,7 +69,7 @@
       box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8), 0 0 15px rgba(212, 175, 55, 0.1);
     }
 
-    /* 🔥 FORCE THE ELEMENT ID TO STRETCH INSIDE INNER WRAPPER */
+    /* 🔥 STRETCH BASE HTML5 LIBRARY FRAMEWORK PLATES */
     #reader { 
       width: 100% !important; 
       height: 100% !important;
@@ -77,7 +77,7 @@
       border: none !important;
     }
     
-    /* Force inner library rendering wrappers to stretch */
+    /* Targets the inner container generated dynamically by html5-qrcode library */
     #reader > div:first-child {
       width: 100% !important;
       height: 100% !important;
@@ -108,6 +108,7 @@
       display: inline-block;
     }
 
+    /* ⚡ SCANNING LINE ADJUSTMENTS BOUND TO THE NEW FRAME SIZE */
     .laser-line {
       position: absolute;
       left: 0;
@@ -128,6 +129,7 @@
       100% { top: 100%; opacity: 0; }
     }
 
+    /* 🏷️ DATA CARD ADJUSTMENTS */
     #result { 
       position: fixed;
       bottom: 4%;
@@ -360,11 +362,11 @@
     }
 
     function initScanner() {
-      // 🛠️ Force responsive camera target box matching the 70% template dimensions
+      // 🛠️ Aspect ratio configured at 1.0 to ensure calculations remain stable
       html5QrcodeScanner = new Html5QrcodeScanner("reader", { 
         fps: 24, 
         rememberLastUsedCamera: true,
-        aspectRatio: 1.0,  // Forces a perfect square grid inside our rectangular 70% layout
+        aspectRatio: 1.0,
         supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA]
       }, false);
       html5QrcodeScanner.render(onScanSuccess, function(error) {});
