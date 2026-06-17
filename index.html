@@ -29,7 +29,6 @@
         radial-gradient(at 50% 0%, rgba(212, 175, 55, 0.08) 0px, transparent 60%);
     }
 
-    /* 🏛️ HEADER POSITIONING */
     .header-overlay {
       width: 100%;
       padding-top: 25px;
@@ -56,20 +55,21 @@
       margin: 0;
     }
 
-    /* 🎥 SCREEN AREA: 70% WIDTH AND HEIGHT WITH GOLD FRAME */
+    /* 🎥 FORCED CAMERA CONTAINER DIMENSIONS */
     .scanner-container {
       position: relative;
       width: 70vw;
       height: 70vh;
-      max-width: 500px; /* Prevents it from getting absurdly wide on tablets */
+      max-width: 500px;
       z-index: 1;
-      background: #000;
+      background: #000000;
       border-radius: 12px;
       overflow: hidden;
       border: 1px solid rgba(214, 175, 55, 0.4);
       box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8), 0 0 15px rgba(212, 175, 55, 0.1);
     }
 
+    /* 🔥 FORCE THE ELEMENT ID TO STRETCH INSIDE INNER WRAPPER */
     #reader { 
       width: 100% !important; 
       height: 100% !important;
@@ -77,7 +77,12 @@
       border: none !important;
     }
     
-    /* Force camera video feed to scale cleanly inside the 70% viewport canvas */
+    /* Force inner library rendering wrappers to stretch */
+    #reader > div:first-child {
+      width: 100% !important;
+      height: 100% !important;
+    }
+
     #reader video {
       width: 100% !important;
       height: 100% !important;
@@ -103,7 +108,6 @@
       display: inline-block;
     }
 
-    /* ⚡ SCANNING LASER BOUND TO THE CONTAINER WINDOW SIZE */
     .laser-line {
       position: absolute;
       left: 0;
@@ -124,7 +128,6 @@
       100% { top: 100%; opacity: 0; }
     }
 
-    /* 🏷️ POPUP DATA OVERLAY OVER THE BOTTOM PANEL */
     #result { 
       position: fixed;
       bottom: 4%;
@@ -172,3 +175,221 @@
       flex-direction: column;
       align-items: center;
       margin-bottom: 10px;
+    }
+    
+    .data-label {
+      font-family: 'Segoe UI', sans-serif;
+      color: #a0aec0;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 2px;
+    }
+
+    .data-value {
+      font-size: 17px;
+      color: #ffffff;
+    }
+
+    .table-badge {
+      margin-top: 15px;
+      padding: 8px;
+      border: 1px dashed rgba(214, 175, 87, 0.4);
+      border-radius: 4px;
+      background: rgba(214, 175, 87, 0.05);
+    }
+
+    .table-title {
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 10px;
+      color: var(--gold-primary);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .table-number {
+      font-size: 26px;
+      color: var(--gold-light);
+      font-weight: bold;
+    }
+
+    .hud-text {
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.3);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-top: 15px;
+      margin-bottom: 5px;
+      z-index: 10;
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+</head>
+<body>
+
+  <div class="header-overlay">
+    <h2>HTM Annual Dinner</h2>
+    <div class="subtitle">Guest Welcoming Portal</div>
+  </div>
+
+  <div class="scanner-container">
+    <div class="laser-line"></div>
+    <div id="reader"></div>
+  </div>
+
+  <div class="hud-text">Digital Concierge Active</div>
+
+  <div id="result"></div>
+
+  <script>
+    var html5QrcodeScanner;
+    var isProcessing = false;
+    
+    var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxdok04fCs9-zoQmWIq7zqwxknw000XnIwrcKP2R5ZHvD7lJrbVNLtBQedUts52I7MP5Q/exec";
+
+    function speakPersonalizedWelcome(name, table) {
+      try {
+        if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel(); 
+
+          var cleanName = name.split('(')[0].trim(); 
+          var customSpeechText = "Weeeelcome, " + cleanName + ". Your table assignment is " + table + ". Please enjoy the show.";
+          
+          var utterance = new SpeechSynthesisUtterance(customSpeechText);
+          var voices = window.speechSynthesis.getVoices();
+          
+          var premiumVoice = voices.find(function(v) {
+            return v.name.includes('Premium') || 
+                   v.name.includes('Natural') || 
+                   v.name.includes('Google US English') || 
+                   v.name.includes('Samantha') || 
+                   v.name.includes('Aria');
+          });
+
+          if (premiumVoice) {
+            utterance.voice = premiumVoice;
+          }
+
+          utterance.rate = 0.78;  
+          utterance.pitch = 1.02; 
+
+          window.speechSynthesis.speak(utterance);
+        }
+      } catch (e) {
+        console.error("Personalized audio processing bypass:", e);
+      }
+    }
+
+    function unlockAudioEngine() {
+      if ('speechSynthesis' in window) {
+        var dummyUtterance = new SpeechSynthesisUtterance("");
+        window.speechSynthesis.speak(dummyUtterance);
+      }
+    }
+
+    function onScanSuccess(decodedText, decodedResult) {
+      if (isProcessing) return;
+      isProcessing = true;
+      
+      var resultDiv = document.getElementById('result');
+      resultDiv.classList.remove('animate-entrance');
+      resultDiv.style.display = 'block';
+      resultDiv.innerHTML = '<div class="success-header" style="color:#a0aec0; letter-spacing:2px;">Verifying Invitation...</div>';
+      
+      var rawText = decodedText.trim();
+      var staffId = rawText;
+      
+      if (rawText.includes(":")) {
+        var partsOfText = rawText.split(":");
+        staffId = partsOfText[partsOfText.length - 1].trim();
+      }
+      
+      var scriptId = 'google_jsonp_bridge';
+      var oldScript = document.getElementById(scriptId);
+      if (oldScript) oldScript.parentNode.removeChild(oldScript);
+      
+      window.handleGoogleResponse = function(responseString) {
+        html5QrcodeScanner.clear().then(function() {
+          var parts = responseString.split("|");
+          
+          if (parts[0] === "SUCCESS") {
+            var displayName = parts[1];    
+            var calculatedTable = parts[2]; 
+            var displayOutlet = parts[3];   
+            
+            speakPersonalizedWelcome(displayName, calculatedTable);
+            
+            resultDiv.classList.add('animate-entrance');
+            resultDiv.innerHTML = 
+              '<div class="success-header">✨ Welcome ✨</div>' +
+              '<div class="data-row"><div class="data-label">Guest Name</div><div class="data-value" style="color:var(--gold-light); font-weight:bold;">' + displayName + '</div></div>' +
+              '<div class="gold-divider"></div>' +
+              '<div class="data-row"><div class="data-label">Outlet</div><div class="data-value" style="color:#ffffff;">' + displayOutlet + '</div></div>' +
+              '<div class="gold-divider"></div>' +
+              '<div class="data-row"><div class="data-label">Staff Code</div><div class="data-value" style="font-size:14px; font-family:monospace;">' + staffId + '</div></div>' +
+              '<div class="table-badge">' +
+                '<div class="table-title">Table Assignment</div>' +
+                '<div class="table-number">' + calculatedTable + '</div>' +
+              '</div>';
+
+            resetScanner(7000); 
+          } else {
+            resultDiv.classList.add('animate-entrance');
+            resultDiv.innerHTML = "<h3 style='color:#fc8181; margin-top:0;'>Invitation Unrecognized</h3><p style='font-size:13px; margin-bottom:0;'>ID " + staffId + " is not registered on the seating charts.</p>";
+            resetScanner(4000);
+          }
+        }).catch(function(err) {
+          console.error("Camera reset issue: ", err);
+          isProcessing = false;
+        });
+      };
+
+      var jsonpUrl = GOOGLE_SCRIPT_URL + "?id=" + encodeURIComponent(staffId) + "&callback=handleGoogleResponse";
+      var script = document.createElement('script');
+      script.id = scriptId;
+      script.src = jsonpUrl;
+      
+      script.onerror = function() {
+        resultDiv.classList.add('animate-entrance');
+        resultDiv.innerHTML = "<h3 style='color:#fc8181; margin-top:0;'>Connection Timeout</h3><p style='font-size:13px; margin-bottom:0;'>Could not reach the database script.</p>";
+        resetScanner(4000);
+      };
+      
+      document.body.appendChild(script);
+    }
+
+    function initScanner() {
+      // 🛠️ Force responsive camera target box matching the 70% template dimensions
+      html5QrcodeScanner = new Html5QrcodeScanner("reader", { 
+        fps: 24, 
+        rememberLastUsedCamera: true,
+        aspectRatio: 1.0,  // Forces a perfect square grid inside our rectangular 70% layout
+        supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA]
+      }, false);
+      html5QrcodeScanner.render(onScanSuccess, function(error) {});
+    }
+
+    function resetScanner(delay) {
+      setTimeout(function() {
+        isProcessing = false;
+        var resultDiv = document.getElementById('result');
+        resultDiv.classList.remove('animate-entrance');
+        resultDiv.style.display = 'none';
+        initScanner();
+      }, delay);
+    }
+
+    window.onload = function() {
+      initScanner();
+      
+      document.body.addEventListener('click', unlockAudioEngine, { once: true });
+      document.body.addEventListener('touchstart', unlockAudioEngine, { once: true });
+      
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.getVoices();
+      }
+    };
+  </script>
+</body>
+</html>
