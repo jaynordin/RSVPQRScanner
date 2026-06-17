@@ -18,32 +18,27 @@
       text-align: center; 
       background: var(--dark-bg); 
       color: #ffffff;
+      padding: 0; 
       margin: 0;
-      padding: 0;
+      background-image: 
+        radial-gradient(at 50% 0%, rgba(212, 175, 55, 0.12) 0px, transparent 60%),
+        radial-gradient(at 0% 100%, rgba(255, 255, 255, 0.02) 0px, transparent 40%);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       overflow-x: hidden;
-      background-image: 
-        radial-gradient(at 50% 0%, rgba(212, 175, 55, 0.08) 0px, transparent 60%);
-    }
-
-    .header-overlay {
-      width: 100%;
-      padding-top: 25px;
-      padding-bottom: 15px;
-      z-index: 10;
     }
 
     h2 { 
       color: var(--gold-light); 
-      margin: 0 0 5px 0; 
+      margin-top: 20px;
+      margin-bottom: 5px; 
       text-transform: uppercase;
       letter-spacing: 4px;
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 300;
-      text-shadow: 0 3px 6px rgba(0, 0, 0, 0.9);
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
     }
 
     .subtitle {
@@ -52,43 +47,49 @@
       color: #8a94a6;
       text-transform: uppercase;
       letter-spacing: 3px;
-      margin: 0;
+      margin-bottom: 20px;
     }
 
-    /* 🎥 FORCED CAMERA CONTAINER DIMENSIONS (70% VIEWPORT WIDTH AND HEIGHT) */
+    /* 🎥 RESIZED: TAKES UP EXACTLY 70% OF THE VIEWPORT WIDTH AND HEIGHT */
     .scanner-container {
       position: relative;
       width: 70vw;
       height: 70vh;
-      max-width: 500px; /* Prevents stretching too wide on wide screens */
-      z-index: 1;
-      background: #000000;
+      max-width: 450px; /* Safeguard threshold for tablet/wider screens */
+      margin: 0 auto;
       border-radius: 12px;
+      padding: 4px;
+      background: linear-gradient(135deg, var(--gold-dark), var(--gold-light), var(--gold-dark));
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
       overflow: hidden;
-      border: 1px solid rgba(214, 175, 55, 0.4);
-      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8), 0 0 15px rgba(212, 175, 55, 0.1);
     }
 
-    /* 🔥 STRETCH BASE HTML5 LIBRARY FRAMEWORK PLATES */
     #reader { 
       width: 100% !important; 
       height: 100% !important;
       background: #000000 !important;
+      border-radius: 8px;
+      overflow: hidden;
       border: none !important;
     }
-    
-    /* Targets the inner container generated dynamically by html5-qrcode library */
+
+    /* 🔥 INTERCEPT AND FORCE DYNAMIC INTERNAL WRAPPERS TO FILL 100% OF THE 70% CONTAINER */
     #reader > div:first-child {
       width: 100% !important;
       height: 100% !important;
     }
-
+    
+    /* 🔄 TARGETS VIDEO STREAM FEEDS TO FILL OUT THE DIMENSION SCALE UNIFORMLY */
     #reader video {
       width: 100% !important;
       height: 100% !important;
       object-fit: cover !important;
       transform: scaleX(-1);
       -webkit-transform: scaleX(-1);
+    }
+
+    #reader border {
+      border: none !important;
     }
 
     #reader a, #reader button {
@@ -103,53 +104,53 @@
       font-weight: bold !important;
       letter-spacing: 1.5px !important;
       cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-      margin: 20px auto !important;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      margin: 15px 0 !important;
       display: inline-block;
     }
 
-    /* ⚡ SCANNING LINE ADJUSTMENTS BOUND TO THE NEW FRAME SIZE */
+    /* ⚡ LASER POSITION BOUND DIRECTLY TO CONTINUOUS DYNAMIC WINDOW CALCULATIONS */
     .laser-line {
       position: absolute;
-      left: 0;
-      right: 0;
-      height: 3px;
+      left: 4px;
+      right: 4px;
+      height: 4px;
       background: linear-gradient(90deg, rgba(212,175,55,0) 0%, rgba(243,229,171,1) 50%, rgba(212,175,55,0) 100%);
       box-shadow: 0 0 15px 3px var(--gold-primary);
       z-index: 5;
-      top: 0;
+      top: 4px;
       pointer-events: none;
-      animation: restrictedLaser 3.5s ease-in-out infinite;
+      animation: goldShimmer 3.5s ease-in-out infinite;
     }
 
-    @keyframes restrictedLaser {
-      0% { top: 0%; opacity: 0; }
+    @keyframes goldShimmer {
+      0% { top: 4px; opacity: 0; }
       10% { opacity: 1; }
       90% { opacity: 1; }
-      100% { top: 100%; opacity: 0; }
+      100% { top: calc(100% - 8px); opacity: 0; }
     }
 
-    /* 🏷️ DATA CARD ADJUSTMENTS */
+    /* 🏷️ FIXED POPUP OVERLAY LAYOUT */
     #result { 
       position: fixed;
-      bottom: 4%;
+      bottom: 3%;
       left: 50%;
       transform: translateX(-50%);
       width: 85%;
-      max-width: 350px; 
+      max-width: 340px; 
       padding: 22px 20px; 
-      border-radius: 12px; 
+      border-radius: 8px; 
       background: var(--panel-bg); 
       border: 1px solid var(--gold-primary);
-      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.9);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      z-index: 10;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 20;
       display: none; 
     }
 
     .animate-entrance {
-      animation: formalEntrance 0.4s cubic-bezier(0.19, 1, 0.22, 1) both;
+      animation: formalEntrance 0.7s cubic-bezier(0.19, 1, 0.22, 1) both;
     }
 
     @keyframes formalEntrance {
@@ -159,46 +160,46 @@
 
     .success-header {
       color: var(--gold-light);
-      font-size: 15px;
+      font-size: 16px;
       font-weight: normal;
       text-transform: uppercase;
       letter-spacing: 4px;
-      margin-bottom: 18px;
+      margin-bottom: 25px;
     }
 
     .gold-divider {
       height: 1px;
       background: linear-gradient(90deg, transparent, var(--gold-primary), transparent);
-      margin: 12px 0;
+      margin: 15px 0;
     }
 
     .data-row {
       display: flex;
       flex-direction: column;
       align-items: center;
-      margin-bottom: 10px;
+      margin-bottom: 16px;
     }
     
     .data-label {
       font-family: 'Segoe UI', sans-serif;
-      color: #a0aec0;
+      color: #718096;
       font-size: 10px;
       text-transform: uppercase;
       letter-spacing: 2px;
-      margin-bottom: 2px;
+      margin-bottom: 4px;
     }
 
     .data-value {
-      font-size: 17px;
+      font-size: 18px;
       color: #ffffff;
     }
 
     .table-badge {
-      margin-top: 15px;
-      padding: 8px;
+      margin-top: 25px;
+      padding: 12px;
       border: 1px dashed rgba(214, 175, 87, 0.4);
       border-radius: 4px;
-      background: rgba(214, 175, 87, 0.05);
+      background: rgba(214, 175, 87, 0.02);
     }
 
     .table-title {
@@ -212,17 +213,15 @@
     .table-number {
       font-size: 26px;
       color: var(--gold-light);
-      font-weight: bold;
     }
 
     .hud-text {
       font-family: 'Segoe UI', sans-serif;
       font-size: 10px;
-      color: rgba(255, 255, 255, 0.3);
-      letter-spacing: 2px;
+      color: #4a5568;
+      letter-spacing: 1.5px;
       text-transform: uppercase;
-      margin-top: 15px;
-      margin-bottom: 5px;
+      margin-top: 12px;
       z-index: 10;
     }
   </style>
@@ -230,11 +229,9 @@
 </head>
 <body>
 
-  <div class="header-overlay">
-    <h2>HTM Annual Dinner</h2>
-    <div class="subtitle">Guest Welcoming Portal</div>
-  </div>
-
+  <h2>HTM Annual Dinner</h2>
+  <div class="subtitle">Guest Welcoming Portal</div>
+  
   <div class="scanner-container">
     <div class="laser-line"></div>
     <div id="reader"></div>
@@ -250,6 +247,7 @@
     
     var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxdok04fCs9-zoQmWIq7zqwxknw000XnIwrcKP2R5ZHvD7lJrbVNLtBQedUts52I7MP5Q/exec";
 
+    // 🌟 FULLY DYNAMIC NEURAL AI CONCIERGE ENGINE
     function speakPersonalizedWelcome(name, table) {
       try {
         if ('speechSynthesis' in window) {
@@ -259,6 +257,7 @@
           var customSpeechText = "Weeeelcome, " + cleanName + ". Your table assignment is " + table + ". Please enjoy the show.";
           
           var utterance = new SpeechSynthesisUtterance(customSpeechText);
+          
           var voices = window.speechSynthesis.getVoices();
           
           var premiumVoice = voices.find(function(v) {
@@ -337,8 +336,7 @@
 
             resetScanner(7000); 
           } else {
-            resultDiv.classList.add('animate-entrance');
-            resultDiv.innerHTML = "<h3 style='color:#fc8181; margin-top:0;'>Invitation Unrecognized</h3><p style='font-size:13px; margin-bottom:0;'>ID " + staffId + " is not registered on the seating charts.</p>";
+            resultDiv.innerHTML = "<h3 style='color:#fc8181;'>Invitation Unrecognized</h3><p style='font-size:13px;'>ID " + staffId + " is not registered on the seating charts.</p>";
             resetScanner(4000);
           }
         }).catch(function(err) {
@@ -353,8 +351,7 @@
       script.src = jsonpUrl;
       
       script.onerror = function() {
-        resultDiv.classList.add('animate-entrance');
-        resultDiv.innerHTML = "<h3 style='color:#fc8181; margin-top:0;'>Connection Timeout</h3><p style='font-size:13px; margin-bottom:0;'>Could not reach the database script.</p>";
+        resultDiv.innerHTML = "<h3 style='color:#fc8181;'>Connection Timeout</h3><p style='font-size:13px;'>Could not reach the database script.</p>";
         resetScanner(4000);
       };
       
@@ -362,12 +359,11 @@
     }
 
     function initScanner() {
-      // 🛠️ Aspect ratio configured at 1.0 to ensure calculations remain stable
+      // 🛠️ qrbox option omitted from settings so video naturally fills 100% of the new 70% bounds safely
       html5QrcodeScanner = new Html5QrcodeScanner("reader", { 
-        fps: 24, 
+        fps: 15, 
         rememberLastUsedCamera: true,
-        aspectRatio: 1.0,
-        supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA]
+        aspectRatio: 1.0
       }, false);
       html5QrcodeScanner.render(onScanSuccess, function(error) {});
     }
