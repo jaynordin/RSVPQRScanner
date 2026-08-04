@@ -26,7 +26,6 @@
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      /* Elegant, luxury geometric wallpaper background pattern */
       background-image: 
         radial-gradient(at 50% 0%, rgba(212, 175, 55, 0.15) 0px, transparent 65%),
         linear-gradient(rgba(13, 15, 18, 0.85), rgba(13, 15, 18, 0.95)),
@@ -35,7 +34,6 @@
       background-attachment: fixed;
     }
 
-    /* Wrap the card so the button stays visible but outside the captured area if needed */
     .card-wrapper {
       width: 90%;
       max-width: 380px;
@@ -47,7 +45,7 @@
     .ticket-card {
       width: 100%;
       box-sizing: border-box;
-      background: #161a21; /* Solid dark color for perfect image conversion */
+      background: #161a21;
       border: 1px solid var(--gold-primary);
       border-radius: 12px;
       padding: 35px 25px;
@@ -57,7 +55,6 @@
       overflow: hidden;
     }
 
-    /* Formal gold accent line at the top */
     .ticket-card::before {
       content: '';
       position: absolute;
@@ -86,7 +83,7 @@
     .qr-frame {
       display: inline-block;
       padding: 12px;
-      background: #ffffff; /* Crisp contrast frame for flawless camera scans */
+      background: #ffffff;
       border-radius: 12px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.4);
       margin-bottom: 25px;
@@ -111,7 +108,6 @@
       margin-bottom: 15px;
     }
 
-    /* Additional Styling for Table Assignment Display */
     .table-box {
       margin-top: 15px;
       padding: 10px 15px;
@@ -137,7 +133,6 @@
       padding-top: 15px;
     }
 
-    /* ✨ SLEEK GOLD SAVE PASS BUTTON STYLING */
     .download-btn {
       font-family: 'Segoe UI', sans-serif;
       background: linear-gradient(135deg, var(--gold-light), var(--gold-primary));
@@ -176,7 +171,6 @@
         <div class="label">Guest Code</div>
         <div id="display-id" class="value" style="font-family: monospace; letter-spacing: 1px;">-</div>
         
-        <!-- Added Table Number Section -->
         <div class="table-box">
           <div class="label">Table Assignment</div>
           <div id="display-table" class="table-value">-</div>
@@ -198,17 +192,23 @@
     }
 
     window.onload = function() {
+      // 1. Fetch values from Google Sheet URL parameters
       var guestId = getUrlParam('id') || "HTM-GUEST";
-      var tableNo = getUrlParam('table') || "TBA";
+      var tableNo = getUrlParam('table') || getUrlParam('table_no') || "TBA";
 
+      // 2. Display on UI
       document.getElementById('display-id').innerText = guestId.toUpperCase();
       document.getElementById('display-table').innerText = tableNo.toUpperCase();
 
+      // 3. Payload encoded into the QR Code
+      var qrPayload = "ID: " + guestId.toUpperCase() + " | TABLE: " + tableNo.toUpperCase();
+
+      // 4. Generate QR Code with combined payload
       var qrCode = new QRCodeStyling({
         width: 240,
         height: 240,
         type: "svg",
-        data: guestId,
+        data: qrPayload, // Encodes both ID and Table Assignment
         dotsOptions: {
           color: "#000000",
           type: "square"
@@ -228,17 +228,15 @@
 
       qrCode.append(document.getElementById("qrcode"));
 
-      // 📥 SCREENSHOT ENGINE EXECUTION
+      // 5. Download Pass Engine
       document.getElementById("download-pass-btn").addEventListener("click", function() {
         var ticketElement = document.getElementById("my-ticket");
         
-        // Take a high-resolution snapshot of the card panel element
         html2canvas(ticketElement, {
-          scale: 3,             // Enhances clarity so it looks crisp on high-end smartphone screens
-          useCORS: true,        // Safely processes elements
-          backgroundColor: null // Keeps background corners perfectly rounded
+          scale: 3,
+          useCORS: true,
+          backgroundColor: null
         }).then(function(canvas) {
-          // Convert the snapshot result into a standard downloadable PNG image file string
           var imagePath = canvas.toDataURL("image/png");
           
           var downloadLink = document.createElement("a");
