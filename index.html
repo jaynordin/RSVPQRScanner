@@ -168,10 +168,10 @@
 
     .table-badge {
       margin-top: 25px;
-      padding: 12px;
-      border: 1px dashed rgba(214, 175, 87, 0.4);
-      border-radius: 4px;
-      background: rgba(214, 175, 87, 0.02);
+      padding: 14px;
+      border: 1px dashed var(--gold-primary);
+      border-radius: 8px;
+      background: rgba(212, 175, 55, 0.08);
     }
 
     .table-title {
@@ -180,11 +180,14 @@
       color: var(--gold-primary);
       text-transform: uppercase;
       letter-spacing: 2px;
+      margin-bottom: 4px;
     }
 
     .table-number {
       font-size: 26px;
+      font-weight: bold;
       color: var(--gold-light);
+      letter-spacing: 1.5px;
     }
 
     .hud-text {
@@ -226,7 +229,7 @@
 
           // Format clean text parameters for natural speaking cadence
           var cleanName = name.split('(')[0].trim(); // Removes any bracketed notes if present
-          var customSpeechText = "Weeeelcome, " + cleanName + ". Your table assignment is " + table + ". Please enjoy the show.";
+          var customSpeechText = "Welcome, " + cleanName + ". Your table assignment is " + table + ". Please enjoy the evening.";
           
           var utterance = new SpeechSynthesisUtterance(customSpeechText);
           
@@ -264,6 +267,33 @@
       }
     }
 
+    // Helper to parse complex QR payloads like "ID: HTM001 | TABLE: TABLE 12"
+    function parseQrPayload(text) {
+      var extractedId = text;
+      var extractedTable = null;
+
+      if (text.includes("|")) {
+        var segments = text.split("|");
+        segments.forEach(function(segment) {
+          var parts = segment.split(":");
+          if (parts.length >= 2) {
+            var key = parts[0].trim().toUpperCase();
+            var val = parts.slice(1).join(":").trim();
+            if (key === "ID") extractedId = val;
+            if (key === "TABLE") extractedTable = val;
+          }
+        });
+      } else if (text.includes(":")) {
+        var parts = text.split(":");
+        extractedId = parts[parts.length - 1].trim();
+      }
+
+      return {
+        id: extractedId,
+        table: extractedTable
+      };
+    }
+
     function onScanSuccess(decodedText, decodedResult) {
       if (isProcessing) return;
       isProcessing = true;
@@ -274,12 +304,9 @@
       resultDiv.innerHTML = '<div class="success-header" style="color:#a0aec0; letter-spacing:2px;">Verifying Invitation...</div>';
       
       var rawText = decodedText.trim();
-      var staffId = rawText;
-      
-      if (rawText.includes(":")) {
-        var partsOfText = rawText.split(":");
-        staffId = partsOfText[partsOfText.length - 1].trim();
-      }
+      var parsedData = parseQrPayload(rawText);
+      var staffId = parsedData.id;
+      var qrTable = parsedData.table;
       
       var scriptId = 'google_jsonp_bridge';
       var oldScript = document.getElementById(scriptId);
@@ -291,8 +318,9 @@
           
           if (parts[0] === "SUCCESS") {
             var displayName = parts[1];    
-            var calculatedTable = parts[2]; 
-            var displayOutlet = parts[3];   
+            // Use QR table code if present, otherwise fall back to Google Sheets database table
+            var calculatedTable = qrTable || parts[2] || "UNASSIGNED"; 
+            var displayOutlet = parts[3] || "-";   
             
             // 🎙️ TRIPPED INSTANTLY: Passing real database variables into the speech engine
             speakPersonalizedWelcome(displayName, calculatedTable);
@@ -304,13 +332,13 @@
               '<div class="gold-divider"></div>' +
               '<div class="data-row"><div class="data-label">Outlet</div><div class="data-value" style="color:#ffffff;">' + displayOutlet + '</div></div>' +
               '<div class="gold-divider"></div>' +
-              '<div class="data-row"><div class="data-label">Staff Code</div><div class="data-value" style="font-size:14px; font-family:monospace;">' + staffId + '</div></div>' +
+              '<div class="data-row"><div class="data-label">Guest Code</div><div class="data-value" style="font-size:14px; font-family:monospace;">' + staffId + '</div></div>' +
               '<div class="table-badge">' +
                 '<div class="table-title">Table Assignment</div>' +
-                '<div class="table-number">' + calculatedTable + '</div>' +
+                '<div class="table-number">' + calculatedTable.toUpperCase() + '</div>' +
               '</div>';
 
-            resetScanner(7000); // 7 seconds delay to let the longer sentence finish speaking smoothly
+            resetScanner(7000); // 7 seconds delay to let audio welcome finish playing
           } else {
             resultDiv.innerHTML = "<h3 style='color:#fc8181;'>Invitation Unrecognized</h3><p style='font-size:13px;'>ID " + staffId + " is not registered on the seating charts.</p>";
             resetScanner(4000);
