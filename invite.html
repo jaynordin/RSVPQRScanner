@@ -186,15 +186,25 @@
   </div>
 
   <script>
+    // Case-insensitive URL parameter lookup function
     function getUrlParam(paramName) {
       var params = new URLSearchParams(window.location.search);
-      return params.get(paramName);
+      for (var key of params.keys()) {
+        if (key.toLowerCase() === paramName.toLowerCase()) {
+          return params.get(key);
+        }
+      }
+      return null;
     }
 
     window.onload = function() {
-      // 1. Fetch values from Google Sheet URL parameters
+      // 1. Fetch values from URL parameters (looks for Table_Number, table_number, table, etc.)
       var guestId = getUrlParam('id') || "HTM-GUEST";
-      var tableNo = getUrlParam('table') || getUrlParam('table_no') || "TBA";
+      var tableNo = getUrlParam('Table_Number') || getUrlParam('table_number') || getUrlParam('table') || getUrlParam('table_no') || "UNASSIGNED";
+
+      // Decode URI components in case values contain encoded characters/spaces
+      tableNo = decodeURIComponent(tableNo);
+      guestId = decodeURIComponent(guestId);
 
       // 2. Display on UI
       document.getElementById('display-id').innerText = guestId.toUpperCase();
@@ -208,7 +218,7 @@
         width: 240,
         height: 240,
         type: "svg",
-        data: qrPayload, // Encodes both ID and Table Assignment
+        data: qrPayload,
         dotsOptions: {
           color: "#000000",
           type: "square"
