@@ -111,6 +111,23 @@
       margin-bottom: 15px;
     }
 
+    /* Additional Styling for Table Assignment Display */
+    .table-box {
+      margin-top: 15px;
+      padding: 10px 15px;
+      background: rgba(212, 175, 55, 0.08);
+      border: 1px dashed var(--gold-primary);
+      border-radius: 8px;
+    }
+
+    .table-value {
+      font-size: 22px;
+      font-weight: bold;
+      color: var(--gold-light);
+      letter-spacing: 1.5px;
+      margin-top: 2px;
+    }
+
     .footer-note {
       font-family: 'Segoe UI', sans-serif;
       font-size: 11px;
@@ -158,6 +175,12 @@
       <div class="guest-info">
         <div class="label">Guest Code</div>
         <div id="display-id" class="value" style="font-family: monospace; letter-spacing: 1px;">-</div>
+        
+        <!-- Added Table Number Section -->
+        <div class="table-box">
+          <div class="label">Table Assignment</div>
+          <div id="display-table" class="table-value">-</div>
+        </div>
       </div>
 
       <div class="footer-note">
@@ -176,7 +199,10 @@
 
     window.onload = function() {
       var guestId = getUrlParam('id') || "HTM-GUEST";
+      var tableNo = getUrlParam('table') || "TBA";
+
       document.getElementById('display-id').innerText = guestId.toUpperCase();
+      document.getElementById('display-table').innerText = tableNo.toUpperCase();
 
       var qrCode = new QRCodeStyling({
         width: 240,
