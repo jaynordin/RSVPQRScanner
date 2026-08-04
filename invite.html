@@ -26,7 +26,7 @@
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      /* Elegant, luxury geometric wallpaper background pattern */
+      /* Elegant background pattern */
       background-image: 
         radial-gradient(at 50% 0%, rgba(212, 175, 55, 0.15) 0px, transparent 65%),
         linear-gradient(rgba(13, 15, 18, 0.85), rgba(13, 15, 18, 0.95)),
@@ -35,7 +35,7 @@
       background-attachment: fixed;
     }
 
-    /* Wrap the card so the button stays visible but outside the captured area if needed */
+    /* Wrap the card so the button stays visible but outside the captured screenshot area */
     .card-wrapper {
       width: 90%;
       max-width: 380px;
@@ -47,7 +47,7 @@
     .ticket-card {
       width: 100%;
       box-sizing: border-box;
-      background: #161a21; /* Solid dark color for perfect image conversion */
+      background: #161a21; /* Solid dark color for crisp image conversion */
       border: 1px solid var(--gold-primary);
       border-radius: 12px;
       padding: 35px 25px;
@@ -86,7 +86,7 @@
     .qr-frame {
       display: inline-block;
       padding: 12px;
-      background: #ffffff; /* Crisp contrast frame for flawless camera scans */
+      background: #ffffff; /* Crisp contrast frame for camera scanners */
       border-radius: 12px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.4);
       margin-bottom: 25px;
@@ -114,7 +114,7 @@
     /* Styled Container for Table Assignment */
     .table-box {
       margin-top: 15px;
-      padding: 10px 15px;
+      padding: 12px 15px;
       background: rgba(212, 175, 55, 0.08);
       border: 1px dashed var(--gold-primary);
       border-radius: 8px;
@@ -137,7 +137,7 @@
       padding-top: 15px;
     }
 
-    /* ✨ SLEEK GOLD SAVE PASS BUTTON STYLING */
+    /* Gold Save Pass Button */
     .download-btn {
       font-family: 'Segoe UI', sans-serif;
       background: linear-gradient(135deg, var(--gold-light), var(--gold-primary));
@@ -191,7 +191,7 @@
   </div>
 
   <script>
-    // Case-insensitive query parameter reader
+    // Robust, case-insensitive parameter reader
     function getUrlParam(paramName) {
       var params = new URLSearchParams(window.location.search);
       for (var key of params.keys()) {
@@ -203,22 +203,28 @@
     }
 
     window.onload = function() {
-      // 1. Read Guest ID and Table Assignment (handles 'Table_Number', 'table_number', 'table', etc.)
+      // 1. Read Guest ID and Table Assignment safely
       var guestId = getUrlParam('id') || "HTM-GUEST";
-      var tableNo = getUrlParam('Table_Number') || getUrlParam('table_number') || getUrlParam('table') || getUrlParam('table_no') || "UNASSIGNED";
+      
+      // Fallback checks across common URL parameter variations
+      var tableNo = getUrlParam('Table_Number') || 
+                    getUrlParam('table_number') || 
+                    getUrlParam('table') || 
+                    getUrlParam('table_no') || 
+                    "UNASSIGNED";
 
-      // Clean up URL-encoded spaces or special characters
+      // Clean up encoded spaces/characters (%20 to space, etc.)
       guestId = decodeURIComponent(guestId);
       tableNo = decodeURIComponent(tableNo);
 
-      // 2. Display values on the pass card UI
+      // 2. Render text onto the card interface
       document.getElementById('display-id').innerText = guestId.toUpperCase();
       document.getElementById('display-table').innerText = tableNo.toUpperCase();
 
-      // 3. Combine Guest Code and Table Assignment into the QR payload
+      // 3. Build the combined payload for the scanner
       var qrPayload = "ID: " + guestId.toUpperCase() + " | TABLE: " + tableNo.toUpperCase();
 
-      // 4. Generate QR Code with the combined payload
+      // 4. Generate the QR Code
       var qrCode = new QRCodeStyling({
         width: 240,
         height: 240,
@@ -243,17 +249,15 @@
 
       qrCode.append(document.getElementById("qrcode"));
 
-      // 📥 SCREENSHOT ENGINE EXECUTION
+      // 5. Screenshot Download Execution
       document.getElementById("download-pass-btn").addEventListener("click", function() {
         var ticketElement = document.getElementById("my-ticket");
         
-        // Take a high-resolution snapshot of the card panel element
         html2canvas(ticketElement, {
-          scale: 3,             // Enhances clarity so it looks crisp on high-end smartphone screens
-          useCORS: true,        // Safely processes elements
-          backgroundColor: null // Keeps background corners perfectly rounded
+          scale: 3,             // High DPI render for mobile screen quality
+          useCORS: true,        // Safely loads assets
+          backgroundColor: null // Preserves rounded corner styling
         }).then(function(canvas) {
-          // Convert the snapshot result into a standard downloadable PNG image file string
           var imagePath = canvas.toDataURL("image/png");
           
           var downloadLink = document.createElement("a");
