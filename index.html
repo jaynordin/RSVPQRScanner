@@ -16,20 +16,44 @@
     body { 
       font-family: 'Georgia', 'Times New Roman', serif; 
       text-align: center; 
-      background: var(--dark-bg); 
       color: #ffffff;
       padding: 20px 15px; 
       margin: 0;
       min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+      background-color: var(--dark-bg);
+    }
 
-      /* 🌟 GOOGLE DRIVE CUSTOM WALLPAPER 🌟 */
-      background-image: 
-        linear-gradient(rgba(13, 15, 18, 0.82), rgba(13, 15, 18, 0.82)), 
-        url('https://lh3.googleusercontent.com/d/1PyhKGAUiJYMthlQfzHt8WiGwujdxRHBV');
+    /* 🌟 ROTATING BACKGROUND SLIDESHOW CONTAINERS 🌟 */
+    .bg-slide {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
       background-position: center center;
       background-repeat: no-repeat;
-      background-attachment: fixed;
       background-size: cover;
+      opacity: 0;
+      transition: opacity 1.5s ease-in-out; /* Smooth crossfade effect */
+    }
+
+    .bg-slide.active {
+      opacity: 1;
+    }
+
+    /* Dark gradient overlay to keep text and camera scanner readable */
+    .bg-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      background: linear-gradient(rgba(13, 15, 18, 0.82), rgba(13, 15, 18, 0.82));
+      pointer-events: none;
     }
 
     h2 { 
@@ -173,7 +197,7 @@
     }
 
     .table-badge {
-      margin-top: 25px;
+      margin-top: 20px;
       padding: 14px;
       border: 1px dashed var(--gold-primary);
       border-radius: 8px;
@@ -196,6 +220,21 @@
       letter-spacing: 1.5px;
     }
 
+    .lucky-badge {
+      margin-top: 15px;
+      padding: 12px;
+      border: 1px solid var(--gold-primary);
+      border-radius: 8px;
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(13, 15, 18, 0.6));
+    }
+
+    .lucky-number {
+      font-size: 22px;
+      font-weight: bold;
+      color: var(--gold-light);
+      letter-spacing: 2px;
+    }
+
     .hud-text {
       font-family: 'Segoe UI', sans-serif;
       font-size: 10px;
@@ -208,6 +247,11 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 </head>
 <body>
+
+  <!-- 🌟 BACKGROUND SLIDESHOW LAYERS 🌟 -->
+  <div id="slide1" class="bg-slide active"></div>
+  <div id="slide2" class="bg-slide"></div>
+  <div class="bg-overlay"></div>
 
   <h2>HTM Annual Dinner 2026</h2>
   <div class="subtitle">Guest Welcoming Portal</div>
@@ -222,6 +266,44 @@
   <div id="result"></div>
 
   <script>
+    // 📸 SLIDESHOW CONFIGURATION - 5 Photos
+    var wallpaperList = [
+      "https://lh3.googleusercontent.com/d/1PyhKGAUiJYMthlQfzHt8WiGwujdxRHBV",
+      "https://lh3.googleusercontent.com/d/1H4Sz6aYgL1E6g3vlJab3cgkJOT0oXFeY",
+      "https://lh3.googleusercontent.com/d/1OQ9X-ZzaJR28-wkfj4nwvK5xKUOm9Wzu",
+      "https://lh3.googleusercontent.com/d/1JsBa8-vjMu69Rq7bFRHW9Wx4eV7qfNWr",
+      "https://lh3.googleusercontent.com/d/1dsvAMmyuWcKb-5i5ytIMqQ7n7-e7x1u0"
+    ];
+    var currentBgIndex = 0;
+    var activeSlide = 1;
+
+    function rotateWallpapers() {
+      if (wallpaperList.length <= 1) return; // Skip rotation if only 1 image exists
+
+      var nextIndex = (currentBgIndex + 1) % wallpaperList.length;
+      var currentSlideEl = document.getElementById(activeSlide === 1 ? 'slide1' : 'slide2');
+      var nextSlideEl = document.getElementById(activeSlide === 1 ? 'slide2' : 'slide1');
+
+      // Preload next image onto inactive background layer
+      nextSlideEl.style.backgroundImage = "url('" + wallpaperList[nextIndex] + "')";
+      
+      // Crossfade opacity
+      nextSlideEl.classList.add('active');
+      currentSlideEl.classList.remove('active');
+
+      // Update state
+      activeSlide = activeSlide === 1 ? 2 : 1;
+      currentBgIndex = nextIndex;
+    }
+
+    function initSlideshow() {
+      if (wallpaperList.length > 0) {
+        document.getElementById('slide1').style.backgroundImage = "url('" + wallpaperList[0] + "')";
+        // Cycle every 6000ms (6 seconds)
+        setInterval(rotateWallpapers, 6000);
+      }
+    }
+
     var html5QrcodeScanner;
     var isProcessing = false;
     
@@ -233,16 +315,12 @@
         if ('speechSynthesis' in window) {
           window.speechSynthesis.cancel(); // Clears any frozen voices instantly
 
-          // Format clean text parameters for natural speaking cadence
-          var cleanName = name.split('(')[0].trim(); // Removes any bracketed notes if present
+          var cleanName = name.split('(')[0].trim();
           var customSpeechText = "Welcome, " + cleanName + ". Your table assignment is " + table + ". Please enjoy the Annual Dinner.";
           
           var utterance = new SpeechSynthesisUtterance(customSpeechText);
-          
-          // Access advanced native platform audio assets
           var voices = window.speechSynthesis.getVoices();
           
-          // Filter out robotic voices, prioritizing rich, expressive accents
           var premiumVoice = voices.find(function(v) {
             return v.name.includes('Premium') || 
                    v.name.includes('Natural') || 
@@ -255,9 +333,8 @@
             utterance.voice = premiumVoice;
           }
 
-          // Elegant, clear hospitality cadence configurations
-          utterance.rate = 1.05;  // Elegant pacing so table names are fully clear
-          utterance.pitch = 1.02; // Sophisticated and inviting tone
+          utterance.rate = 1.05;  
+          utterance.pitch = 1.02; 
 
           window.speechSynthesis.speak(utterance);
         }
@@ -273,7 +350,6 @@
       }
     }
 
-    // Helper to parse complex QR payloads like "ID: HTM001 | TABLE: TABLE 12"
     function parseQrPayload(text) {
       var extractedId = text;
       var extractedTable = null;
@@ -324,11 +400,10 @@
           
           if (parts[0] === "SUCCESS") {
             var displayName = parts[1];    
-            // Use QR table code if present, otherwise fall back to Google Sheets database table
             var calculatedTable = qrTable || parts[2] || "UNASSIGNED"; 
             var displayOutlet = parts[3] || "-";   
+            var luckyDrawNo = parts[4] || "-";
             
-            // 🎙️ TRIPPED INSTANTLY: Passing real database variables into the speech engine
             speakPersonalizedWelcome(displayName, calculatedTable);
             
             resultDiv.classList.add('animate-entrance');
@@ -342,9 +417,13 @@
               '<div class="table-badge">' +
                 '<div class="table-title">Table Assignment</div>' +
                 '<div class="table-number">' + calculatedTable.toUpperCase() + '</div>' +
+              '</div>' +
+              '<div class="lucky-badge">' +
+                '<div class="table-title">Lucky Draw No.</div>' +
+                '<div class="lucky-number">🎟️ ' + luckyDrawNo + '</div>' +
               '</div>';
 
-            resetScanner(7000); // 7 seconds delay to let audio welcome finish playing
+            resetScanner(7000); 
           } else {
             resultDiv.innerHTML = "<h3 style='color:#fc8181;'>Invitation Unrecognized</h3><p style='font-size:13px;'>ID " + staffId + " is not registered on the seating charts.</p>";
             resetScanner(4000);
@@ -389,6 +468,7 @@
     }
 
     window.onload = function() {
+      initSlideshow(); // 🚀 Initialize Wallpaper Slideshow
       initScanner();
       
       document.body.addEventListener('click', unlockAudioEngine, { once: true });
