@@ -284,23 +284,80 @@
       qrCode.append(document.getElementById("qrcode"));
 
       // 5. Screenshot Download Execution
+     // document.getElementById("download-pass-btn").addEventListener("click", function() {
+        //var ticketElement = document.getElementById("my-ticket");
+        
+        //html2canvas(ticketElement, {
+         // scale: 3,             // High DPI render for mobile screen quality
+         // useCORS: true,        // Safely loads assets
+         // backgroundColor: null // Preserves rounded corner styling
+       // }).then(function(canvas) {
+        // var imagePath = canvas.toDataURL("image/png");
+          
+         // var downloadLink = document.createElement("a");
+         // downloadLink.download = "HTM_Dinner_Pass_" + guestId.toUpperCase() + ".png";
+          //downloadLink.href = imagePath;
+          
+        // document.body.appendChild(downloadLink);
+        //  downloadLink.click();
+         // document.body.removeChild(downloadLink);
+      // 5. iOS-Compatible Screenshot Download & Share Execution
       document.getElementById("download-pass-btn").addEventListener("click", function() {
         var ticketElement = document.getElementById("my-ticket");
+        var btn = this;
+        btn.innerText = "Generating Pass...";
         
         html2canvas(ticketElement, {
           scale: 3,             // High DPI render for mobile screen quality
           useCORS: true,        // Safely loads assets
           backgroundColor: null // Preserves rounded corner styling
         }).then(function(canvas) {
-          var imagePath = canvas.toDataURL("image/png");
           
-          var downloadLink = document.createElement("a");
-          downloadLink.download = "HTM_Dinner_Pass_" + guestId.toUpperCase() + ".png";
-          downloadLink.href = imagePath;
-          
-          document.body.appendChild(downloadLink);
-          downloadLink.click();
-          document.body.removeChild(downloadLink);
+          // Convert canvas to Blob for native file handling
+          canvas.toBlob(function(blob) {
+            if (!blob) {
+              alert("Failed to generate pass image.");
+              btn.innerText = "Save Pass to Phone";
+              return;
+            }
+
+            var fileName = "HTM_Dinner_Pass_" + guestId.toUpperCase() + ".png";
+            var file = new File([blob], fileName, { type: "image/png" });
+
+            // 📱 Fix for iPhones: Use Native Share Sheet if available
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+              navigator.share({
+                files: [file],
+                title: "HTM Annual Dinner Pass",
+                text: "Here is my official digital pass for the HTM Annual Dinner."
+              }).then(function() {
+                btn.innerText = "Save Pass to Phone";
+              }).catch(function(err) {
+                console.log("Share cancelled or failed:", err);
+                btn.innerText = "Save Pass to Phone";
+              });
+            } else {
+              // 💻 Fallback for standard Desktop downloads
+              var imagePath = URL.createObjectURL(blob);
+              var downloadLink = document.createElement("a");
+              downloadLink.download = fileName;
+              downloadLink.href = imagePath;
+              
+              document.body.appendChild(downloadLink);
+              downloadLink.click();
+              document.body.removeChild(downloadLink);
+              
+              setTimeout(function() {
+                URL.revokeObjectURL(imagePath);
+                btn.innerText = "Save Pass to Phone";
+              }, 1000);
+            }
+          }, "image/png");
+
+        }).catch(function(err) {
+          console.error("Canvas error:", err);
+          alert("Could not generate image. Please try taking a screenshot instead.");
+          btn.innerText = "Save Pass to Phone";
         });
       });
     };
