@@ -37,14 +37,13 @@
       background-repeat: no-repeat;
       background-size: cover;
       opacity: 0;
-      transition: opacity 1.5s ease-in-out; /* Smooth crossfade effect */
+      transition: opacity 1.5s ease-in-out;
     }
 
     .bg-slide.active {
       opacity: 1;
     }
 
-    /* Dark gradient overlay to keep text and camera scanner readable */
     .bg-overlay {
       position: fixed;
       top: 0;
@@ -94,7 +93,6 @@
       overflow: hidden;
     }
     
-    /* 🔄 TARGETS ONLY THE VIDEO FEED AND KEEPS TEXT NORMAL */
     #reader video {
       transform: scaleX(-1);
       -webkit-transform: scaleX(-1);
@@ -277,20 +275,16 @@
     var activeSlide = 1;
 
     function rotateWallpapers() {
-      if (wallpaperList.length <= 1) return; // Skip rotation if only 1 image exists
+      if (wallpaperList.length <= 1) return;
 
       var nextIndex = (currentBgIndex + 1) % wallpaperList.length;
       var currentSlideEl = document.getElementById(activeSlide === 1 ? 'slide1' : 'slide2');
       var nextSlideEl = document.getElementById(activeSlide === 1 ? 'slide2' : 'slide1');
 
-      // Preload next image onto inactive background layer
       nextSlideEl.style.backgroundImage = "url('" + wallpaperList[nextIndex] + "')";
-      
-      // Crossfade opacity
       nextSlideEl.classList.add('active');
       currentSlideEl.classList.remove('active');
 
-      // Update state
       activeSlide = activeSlide === 1 ? 2 : 1;
       currentBgIndex = nextIndex;
     }
@@ -298,7 +292,6 @@
     function initSlideshow() {
       if (wallpaperList.length > 0) {
         document.getElementById('slide1').style.backgroundImage = "url('" + wallpaperList[0] + "')";
-        // Cycle every 6000ms (6 seconds)
         setInterval(rotateWallpapers, 6000);
       }
     }
@@ -308,35 +301,73 @@
     
     var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxdok04fCs9-zoQmWIq7zqwxknw000XnIwrcKP2R5ZHvD7lJrbVNLtBQedUts52I7MP5Q/exec";
 
-    // 🌟 FULLY DYNAMIC NEURAL AI CONCIERGE ENGINE
+    // 🔊 AUDIO / SPEECH ENGINE SETUP
+    var availableVoices = [];
+
+    function populateVoiceList() {
+      if ('speechSynthesis' in window) {
+        availableVoices = window.speechSynthesis.getVoices();
+      }
+    }
+
+    if ('speechSynthesis' in window) {
+      populateVoiceList();
+      if (speechSynthesis.onvoiceschanged !== undefined) {
+        speechSynthesis.onvoiceschanged = populateVoiceList;
+      }
+    }
+
     function speakPersonalizedWelcome(name, table) {
       try {
-        if ('speechSynthesis' in window) {
-          window.speechSynthesis.cancel(); // Clears any frozen voices instantly
+        if (!('speechSynthesis' in window)) return;
 
-          var cleanName = name.split('(')[0].trim();
-          var customSpeechText = "Welcome, " + cleanName + ". Your table assignment is " + table + ". Please enjoy the Annual Dinner.";
-          
-          var utterance = new SpeechSynthesisUtterance(customSpeechText);
-          var voices = window.speechSynthesis.getVoices();
-          
-          var premiumVoice = voices.find(function(v) {
-            return v.name.includes('Premium') || 
-                   v.name.includes('Natural') || 
-                   v.name.includes('Google US English') || 
-                   v.name.includes('Samantha') || 
-                   v.name.includes('Aria');
-          });
-
-          if (premiumVoice) {
-            utterance.voice = premiumVoice;
-          }
-
-          utterance.rate = 1.05;  
-          utterance.pitch = 1.02; 
-
-          window.speechSynthesis.speak(utterance);
+        // Clear active speech queue safely
+        if (window.speechSynthesis.speaking) {
+          window.speechSynthesis.cancel();
         }
+
+        // 1. Remove text inside parentheses (e.g. "(HR Dept)")
+        var cleanName = name.split('(')[0].trim();
+
+        // 2. Remove common titles if present
+        cleanName = cleanName.replace(/^(Mr\.|Mrs\.|Ms\.|Dr\.|Dato\.|Datin\.|En\.|Puan|Cik)\s+/i, '');
+
+        // 3. Shorten long names to first 2 words for smooth greeting
+        var nameWords = cleanName.split(/\s+/);
+        if (nameWords.length > 2) {
+          cleanName = nameWords[0] + " " + nameWords[1];
+        }
+
+        var customSpeechText = "Welcome, " + cleanName + ". Your table assignment is " + table + ". Please enjoy the Annual Dinner.";
+        
+        var utterance = new SpeechSynthesisUtterance(customSpeechText);
+
+        if (availableVoices.length === 0) {
+          availableVoices = window.speechSynthesis.getVoices();
+        }
+        
+        var selectedVoice = availableVoices.find(function(v) {
+          return v.name.includes('Premium') || 
+                 v.name.includes('Natural') || 
+                 v.name.includes('Google US English') || 
+                 v.name.includes('Samantha') || 
+                 v.name.includes('Aria');
+        }) || availableVoices.find(function(v) {
+          return v.lang && (v.lang.startsWith('en') || v.lang.startsWith('en-US'));
+        });
+
+        if (selectedVoice) {
+          utterance.voice = selectedVoice;
+        }
+
+        utterance.rate = 0.95;
+        utterance.pitch = 1.0; 
+
+        // 🎯 Buffer delay prevents camera shutdown from interrupting speech
+        setTimeout(function() {
+          window.speechSynthesis.speak(utterance);
+        }, 300);
+
       } catch (e) {
         console.error("Personalized audio processing bypass:", e);
       }
@@ -344,7 +375,9 @@
 
     function unlockAudioEngine() {
       if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
         var dummyUtterance = new SpeechSynthesisUtterance("");
+        dummyUtterance.volume = 0.01;
         window.speechSynthesis.speak(dummyUtterance);
       }
     }
@@ -403,8 +436,6 @@
             var displayOutlet = parts[3] || "-";   
             var luckyDrawNo = parts[4] || "-";
             
-            speakPersonalizedWelcome(displayName, calculatedTable);
-            
             resultDiv.classList.add('animate-entrance');
             resultDiv.innerHTML = 
               '<div class="success-header">✨ Welcome ✨</div>' +
@@ -421,6 +452,8 @@
                 '<div class="table-title">Lucky Draw No.</div>' +
                 '<div class="lucky-number">🎟️ ' + luckyDrawNo + '</div>' +
               '</div>';
+
+            speakPersonalizedWelcome(displayName, calculatedTable);
 
             resetScanner(7000); 
           } else {
@@ -467,15 +500,12 @@
     }
 
     window.onload = function() {
-      initSlideshow(); // 🚀 Initialize Wallpaper Slideshow
+      initSlideshow(); 
       initScanner();
+      populateVoiceList();
       
       document.body.addEventListener('click', unlockAudioEngine, { once: true });
       document.body.addEventListener('touchstart', unlockAudioEngine, { once: true });
-      
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.getVoices();
-      }
     };
   </script>
 </body>
