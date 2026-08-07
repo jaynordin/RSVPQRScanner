@@ -20,7 +20,7 @@
       background: var(--dark-bg);
       color: #ffffff;
       margin: 0;
-      padding: 0;
+      padding: 20px 0;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -80,7 +80,7 @@
       color: #8a94a6;
       text-transform: uppercase;
       letter-spacing: 2px;
-      margin-bottom: 30px;
+      margin-bottom: 25px;
     }
 
     .qr-frame {
@@ -89,11 +89,11 @@
       background: #ffffff; /* Crisp contrast frame for camera scanners */
       border-radius: 12px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-      margin-bottom: 25px;
+      margin-bottom: 20px;
     }
 
     .guest-info {
-      margin-top: 10px;
+      margin-top: 5px;
     }
 
     .label {
@@ -106,25 +106,42 @@
     }
 
     .value {
-      font-size: 20px;
+      font-size: 18px;
       color: #ffffff;
-      margin-bottom: 15px;
+      margin-bottom: 12px;
     }
 
     /* Styled Container for Table Assignment */
     .table-box {
-      margin-top: 15px;
-      padding: 12px 15px;
+      margin-top: 12px;
+      padding: 10px 15px;
       background: rgba(212, 175, 55, 0.08);
       border: 1px dashed var(--gold-primary);
       border-radius: 8px;
     }
 
     .table-value {
-      font-size: 22px;
+      font-size: 20px;
       font-weight: bold;
       color: var(--gold-light);
       letter-spacing: 1.5px;
+      margin-top: 2px;
+    }
+
+    /* Styled Container for Lucky Draw Number */
+    .lucky-box {
+      margin-top: 12px;
+      padding: 12px 15px;
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(22, 26, 33, 0.95));
+      border: 1px solid var(--gold-primary);
+      border-radius: 8px;
+    }
+
+    .lucky-value {
+      font-size: 22px;
+      font-weight: bold;
+      color: var(--gold-light);
+      letter-spacing: 2px;
       margin-top: 2px;
     }
 
@@ -132,9 +149,9 @@
       font-family: 'Segoe UI', sans-serif;
       font-size: 11px;
       color: #718096;
-      margin-top: 25px;
+      margin-top: 20px;
       border-top: 1px solid rgba(214, 175, 87, 0.2);
-      padding-top: 15px;
+      padding-top: 12px;
     }
 
     /* Gold Save Pass Button */
@@ -180,6 +197,12 @@
           <div class="label">Table Assignment</div>
           <div id="display-table" class="table-value">-</div>
         </div>
+
+        <!-- 🎟️ Lucky Draw Display Box -->
+        <div class="lucky-box">
+          <div class="label">Lucky Draw No.</div>
+          <div id="display-lucky" class="lucky-value">🎟️ -</div>
+        </div>
       </div>
 
       <div class="footer-note">
@@ -203,7 +226,7 @@
     }
 
     window.onload = function() {
-      // 1. Read Guest ID and Table Assignment safely
+      // 1. Read Guest ID, Table Assignment, and Lucky Draw No. safely
       var guestId = getUrlParam('id') || "HTM-GUEST";
       
       // Fallback checks across common URL parameter variations
@@ -213,16 +236,27 @@
                     getUrlParam('table_no') || 
                     "UNASSIGNED";
 
+      var luckyDrawNo = getUrlParam('Lucky_Draw_No') || 
+                        getUrlParam('luckydraw') || 
+                        getUrlParam('lucky_draw') || 
+                        getUrlParam('luckydrawno') || 
+                        getUrlParam('lucky') || 
+                        "-";
+
       // Clean up encoded spaces/characters (%20 to space, etc.)
       guestId = decodeURIComponent(guestId);
       tableNo = decodeURIComponent(tableNo);
+      luckyDrawNo = decodeURIComponent(luckyDrawNo);
 
       // 2. Render text onto the card interface
       document.getElementById('display-id').innerText = guestId.toUpperCase();
       document.getElementById('display-table').innerText = tableNo.toUpperCase();
+      document.getElementById('display-lucky').innerText = "🎟️ " + luckyDrawNo.toUpperCase();
 
       // 3. Build the combined payload for the scanner
-      var qrPayload = "ID: " + guestId.toUpperCase() + " | TABLE: " + tableNo.toUpperCase();
+      var qrPayload = "ID: " + guestId.toUpperCase() + 
+                      " | TABLE: " + tableNo.toUpperCase() + 
+                      " | LUCKY: " + luckyDrawNo.toUpperCase();
 
       // 4. Generate the QR Code
       var qrCode = new QRCodeStyling({
