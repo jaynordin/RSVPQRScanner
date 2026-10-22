@@ -1,514 +1,512 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>HTM Grand Annual Dinner - Guest Check-In</title>
-  <style>
-    :root {
-      --gold-primary: #d4af37;
-      --gold-light: #f3e5ab;
-      --gold-dark: #aa7c11;
-      --dark-bg: #0d0f12;
-      --panel-bg: rgba(22, 26, 33, 0.95);
-    }
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HTM Grand Annual Dinner - Guest Check-In</title>
+  <style>
+    :root {
+      --gold-primary: #d4af37;
+      --gold-light: #f3e5ab;
+      --gold-dark: #aa7c11;
+      --dark-bg: #0d0f12;
+      --panel-bg: rgba(22, 26, 33, 0.95);
+    }
 
-    body { 
-      font-family: 'Georgia', 'Times New Roman', serif; 
-      text-align: center; 
-      color: #ffffff;
-      padding: 20px 15px; 
-      margin: 0;
-      min-height: 100vh;
-      position: relative;
-      overflow-x: hidden;
-      background-color: var(--dark-bg);
-    }
+    body { 
+      font-family: 'Georgia', 'Times New Roman', serif; 
+      text-align: center; 
+      color: #ffffff;
+      padding: 20px 15px; 
+      margin: 0;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+      background-color: var(--dark-bg);
+    }
 
-    /* 🌟 ROTATING BACKGROUND SLIDESHOW CONTAINERS 🌟 */
-    .bg-slide {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -2;
-      background-position: center center;
-      background-repeat: no-repeat;
-      background-size: cover;
-      opacity: 0;
-      transition: opacity 1.5s ease-in-out;
-    }
+    /* 🌟 ROTATING BACKGROUND SLIDESHOW CONTAINERS 🌟 */
+    .bg-slide {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+      background-position: center center;
+      background-repeat: no-repeat;
+      background-size: cover;
+      opacity: 0;
+      transition: opacity 1.5s ease-in-out;
+    }
 
-    .bg-slide.active {
-      opacity: 1;
-    }
+    .bg-slide.active {
+      opacity: 1;
+    }
 
-    .bg-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
-      background: linear-gradient(rgba(13, 15, 18, 0.82), rgba(13, 15, 18, 0.82));
-      pointer-events: none;
-    }
+    .bg-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      background: linear-gradient(rgba(13, 15, 18, 0.82), rgba(13, 15, 18, 0.82));
+      pointer-events: none;
+    }
 
-    h2 { 
-      color: var(--gold-light); 
-      margin-top: 10px;
-      margin-bottom: 5px; 
-      text-transform: uppercase;
-      letter-spacing: 4px;
-      font-size: 20px;
-      font-weight: 300;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
-    }
+    h2 { 
+      color: var(--gold-light); 
+      margin-top: 10px;
+      margin-bottom: 5px; 
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      font-size: 20px;
+      font-weight: 300;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+    }
 
-    .subtitle {
-      font-family: 'Segoe UI', sans-serif;
-      font-size: 11px;
-      color: #8a94a6;
-      text-transform: uppercase;
-      letter-spacing: 3px;
-      margin-bottom: 25px;
-    }
+    .subtitle {
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 11px;
+      color: #8a94a6;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      margin-bottom: 25px;
+    }
 
-    .scanner-container {
-      position: relative;
-      width: 100%;
-      max-width: 360px;
-      margin: 0 auto;
-      border-radius: 8px;
-      padding: 6px;
-      background: linear-gradient(135deg, var(--gold-dark), var(--gold-light), var(--gold-dark));
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    }
+    .scanner-container {
+      position: relative;
+      width: 100%;
+      max-width: 360px;
+      margin: 0 auto;
+      border-radius: 8px;
+      padding: 6px;
+      background: linear-gradient(135deg, var(--gold-dark), var(--gold-light), var(--gold-dark));
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
 
-    #reader { 
-      width: 100% !important; 
-      background: #000000 !important;
-      border-radius: 4px;
-      overflow: hidden;
-    }
-    
-    #reader video {
-      transform: scaleX(-1);
-      -webkit-transform: scaleX(-1);
-    }
+    #reader { 
+      width: 100% !important; 
+      background: #000000 !important;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    #reader video {
+      transform: scaleX(-1);
+      -webkit-transform: scaleX(-1);
+    }
 
-    #reader border {
-      border: none !important;
-    }
+    #reader border {
+      border: none !important;
+    }
 
-    #reader a, #reader button {
-      font-family: 'Segoe UI', sans-serif;
-      color: #000000 !important;
-      border: none !important;
-      background: linear-gradient(to bottom, var(--gold-light), var(--gold-primary)) !important;
-      padding: 10px 20px !important;
-      border-radius: 4px !important;
-      text-transform: uppercase !important;
-      font-size: 11px !important;
-      font-weight: bold !important;
-      letter-spacing: 1.5px !important;
-      cursor: pointer;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-      margin: 10px 0 !important;
-    }
+    #reader a, #reader button {
+      font-family: 'Segoe UI', sans-serif;
+      color: #000000 !important;
+      border: none !important;
+      background: linear-gradient(to bottom, var(--gold-light), var(--gold-primary)) !important;
+      padding: 10px 20px !important;
+      border-radius: 4px !important;
+      text-transform: uppercase !important;
+      font-size: 11px !important;
+      font-weight: bold !important;
+      letter-spacing: 1.5px !important;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      margin: 10px 0 !important;
+    }
 
-    .laser-line {
-      position: absolute;
-      left: 6px;
-      right: 6px;
-      height: 4px;
-      background: linear-gradient(90deg, rgba(212,175,55,0) 0%, rgba(243,229,171,1) 50%, rgba(212,175,55,0) 100%);
-      box-shadow: 0 0 15px 3px var(--gold-primary);
-      z-index: 5;
-      top: 6px;
-      pointer-events: none;
-      animation: goldShimmer 3.5s ease-in-out infinite;
-    }
+    .laser-line {
+      position: absolute;
+      left: 6px;
+      right: 6px;
+      height: 4px;
+      background: linear-gradient(90deg, rgba(212,175,55,0) 0%, rgba(243,229,171,1) 50%, rgba(212,175,55,0) 100%);
+      box-shadow: 0 0 15px 3px var(--gold-primary);
+      z-index: 5;
+      top: 6px;
+      pointer-events: none;
+      animation: goldShimmer 3.5s ease-in-out infinite;
+    }
 
-    @keyframes goldShimmer {
-      0% { top: 6px; opacity: 0; }
-      10% { opacity: 1; }
-      90% { opacity: 1; }
-      100% { top: calc(100% - 10px); opacity: 0; }
-    }
+    @keyframes goldShimmer {
+      0% { top: 6px; opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { top: calc(100% - 10px); opacity: 0; }
+    }
 
-    #result { 
-      margin: 30px auto 0 auto; 
-      max-width: 340px; 
-      padding: 30px 25px; 
-      border-radius: 8px; 
-      background: var(--panel-bg); 
-      border: 1px solid var(--gold-primary);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
-      display: none; 
-    }
+    #result { 
+      margin: 30px auto 0 auto; 
+      max-width: 340px; 
+      padding: 30px 25px; 
+      border-radius: 8px; 
+      background: var(--panel-bg); 
+      border: 1px solid var(--gold-primary);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+      display: none; 
+    }
 
-    .animate-entrance {
-      animation: formalEntrance 0.7s cubic-bezier(0.19, 1, 0.22, 1) both;
-    }
+    .animate-entrance {
+      animation: formalEntrance 0.7s cubic-bezier(0.19, 1, 0.22, 1) both;
+    }
 
-    @keyframes formalEntrance {
-      0% { transform: translateY(30px) scale(0.96); opacity: 0; }
-      100% { transform: translateY(0) scale(1); opacity: 1; }
-    }
+    @keyframes formalEntrance {
+      0% { transform: translateY(30px) scale(0.96); opacity: 0; }
+      100% { transform: translateY(0) scale(1); opacity: 1; }
+    }
 
-    .success-header {
-      color: var(--gold-light);
-      font-size: 16px;
-      font-weight: normal;
-      text-transform: uppercase;
-      letter-spacing: 4px;
-      margin-bottom: 25px;
-    }
+    .success-header {
+      color: var(--gold-light);
+      font-size: 16px;
+      font-weight: normal;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      margin-bottom: 25px;
+    }
 
-    .gold-divider {
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--gold-primary), transparent);
-      margin: 15px 0;
-    }
+    .gold-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold-primary), transparent);
+      margin: 15px 0;
+    }
 
-    .data-row {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-    
-    .data-label {
-      font-family: 'Segoe UI', sans-serif;
-      color: #718096;
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      margin-bottom: 4px;
-    }
+    .data-row {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    
+    .data-label {
+      font-family: 'Segoe UI', sans-serif;
+      color: #718096;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 4px;
+    }
 
-    .data-value {
-      font-size: 18px;
-      color: #ffffff;
-    }
+    .data-value {
+      font-size: 18px;
+      color: #ffffff;
+    }
 
-    .table-badge {
-      margin-top: 20px;
-      padding: 14px;
-      border: 1px dashed var(--gold-primary);
-      border-radius: 8px;
-      background: rgba(212, 175, 55, 0.08);
-    }
+    .table-badge {
+      margin-top: 20px;
+      padding: 14px;
+      border: 1px dashed var(--gold-primary);
+      border-radius: 8px;
+      background: rgba(212, 175, 55, 0.08);
+    }
 
-    .table-title {
-      font-family: 'Segoe UI', sans-serif;
-      font-size: 10px;
-      color: var(--gold-primary);
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      margin-bottom: 4px;
-    }
+    .table-title {
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 10px;
+      color: var(--gold-primary);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 4px;
+    }
 
-    .table-number {
-      font-size: 26px;
-      font-weight: bold;
-      color: var(--gold-light);
-      letter-spacing: 1.5px;
-    }
+    .table-number {
+      font-size: 26px;
+      font-weight: bold;
+      color: var(--gold-light);
+      letter-spacing: 1.5px;
+    }
 
-    .lucky-badge {
-      margin-top: 15px;
-      padding: 12px;
-      border: 1px solid var(--gold-primary);
-      border-radius: 8px;
-      background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(13, 15, 18, 0.6));
-    }
+    .lucky-badge {
+      margin-top: 15px;
+      padding: 12px;
+      border: 1px solid var(--gold-primary);
+      border-radius: 8px;
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(13, 15, 18, 0.6));
+    }
 
-    .lucky-number {
-      font-size: 22px;
-      font-weight: bold;
-      color: var(--gold-light);
-      letter-spacing: 2px;
-    }
+    .lucky-number {
+      font-size: 22px;
+      font-weight: bold;
+      color: var(--gold-light);
+      letter-spacing: 2px;
+    }
 
-    .hud-text {
-      font-family: 'Segoe UI', sans-serif;
-      font-size: 10px;
-      color: #4a5568;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      margin-top: 12px;
-    }
-  </style>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+    .hud-text {
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 10px;
+      color: #4a5568;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-top: 12px;
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 </head>
 <body>
 
-  <!-- 🌟 BACKGROUND SLIDESHOW LAYERS 🌟 -->
-  <div id="slide1" class="bg-slide active"></div>
-  <div id="slide2" class="bg-slide"></div>
-  <div class="bg-overlay"></div>
+  <!-- 🌟 BACKGROUND SLIDESHOW LAYERS 🌟 -->
+  <div id="slide1" class="bg-slide active"></div>
+  <div id="slide2" class="bg-slide"></div>
+  <div class="bg-overlay"></div>
 
-  <h2>HTM Annual Dinner 2026</h2>
-  <div class="subtitle">Guest Welcoming Portal</div>
-  
-  <div class="scanner-container">
-    <div class="laser-line"></div>
-    <div id="reader"></div>
-  </div>
+  <h2>HTM Annual Dinner 2026</h2>
+  <div class="subtitle">Guest Welcoming Portal</div>
+  
+  <div class="scanner-container">
+    <div class="laser-line"></div>
+    <div id="reader"></div>
+  </div>
 
-  <div class="hud-text">Digital Concierge Active</div>
+  <div class="hud-text">Digital Concierge Active</div>
 
-  <div id="result"></div>
+  <div id="result"></div>
 
-  <script>
-    // 📸 SLIDESHOW CONFIGURATION - 5 Photos
-    var wallpaperList = [
-      "https://lh3.googleusercontent.com/d/1H4Sz6aYgL1E6g3vlJab3cgkJOT0oXFeY",
-      "https://lh3.googleusercontent.com/d/1OQ9X-ZzaJR28-wkfj4nwvK5xKUOm9Wzu",
-      "https://lh3.googleusercontent.com/d/1JsBa8-vjMu69Rq7bFRHW9Wx4eV7qfNWr",
-      "https://lh3.googleusercontent.com/d/1dsvAMmyuWcKb-5i5ytIMqQ7n7-e7x1u0"
-    ];
-    var currentBgIndex = 0;
-    var activeSlide = 1;
+  <script>
+    // 📸 SLIDESHOW CONFIGURATION - 5 Photos
+    var wallpaperList = [
+      "https://lh3.googleusercontent.com/d/1H4Sz6aYgL1E6g3vlJab3cgkJOT0oXFeY",
+      "https://lh3.googleusercontent.com/d/1OQ9X-ZzaJR28-wkfj4nwvK5xKUOm9Wzu",
+      "https://lh3.googleusercontent.com/d/1JsBa8-vjMu69Rq7bFRHW9Wx4eV7qfNWr",
+      "https://lh3.googleusercontent.com/d/1dsvAMmyuWcKb-5i5ytIMqQ7n7-e7x1u0"
+    ];
+    var currentBgIndex = 0;
+    var activeSlide = 1;
 
-    function rotateWallpapers() {
-      if (wallpaperList.length <= 1) return;
+    function rotateWallpapers() {
+      if (wallpaperList.length <= 1) return;
 
-      var nextIndex = (currentBgIndex + 1) % wallpaperList.length;
-      var currentSlideEl = document.getElementById(activeSlide === 1 ? 'slide1' : 'slide2');
-      var nextSlideEl = document.getElementById(activeSlide === 1 ? 'slide2' : 'slide1');
+      var nextIndex = (currentBgIndex + 1) % wallpaperList.length;
+      var currentSlideEl = document.getElementById(activeSlide === 1 ? 'slide1' : 'slide2');
+      var nextSlideEl = document.getElementById(activeSlide === 1 ? 'slide2' : 'slide1');
 
-      nextSlideEl.style.backgroundImage = "url('" + wallpaperList[nextIndex] + "')";
-      nextSlideEl.classList.add('active');
-      currentSlideEl.classList.remove('active');
+      nextSlideEl.style.backgroundImage = "url('" + wallpaperList[nextIndex] + "')";
+      nextSlideEl.classList.add('active');
+      currentSlideEl.classList.remove('active');
 
-      activeSlide = activeSlide === 1 ? 2 : 1;
-      currentBgIndex = nextIndex;
-    }
+      activeSlide = activeSlide === 1 ? 2 : 1;
+      currentBgIndex = nextIndex;
+    }
 
-    function initSlideshow() {
-      if (wallpaperList.length > 0) {
-        document.getElementById('slide1').style.backgroundImage = "url('" + wallpaperList[0] + "')";
-        setInterval(rotateWallpapers, 6000);
-      }
-    }
+    function initSlideshow() {
+      if (wallpaperList.length > 0) {
+        document.getElementById('slide1').style.backgroundImage = "url('" + wallpaperList[0] + "')";
+        setInterval(rotateWallpapers, 6000);
+      }
+    }
 
-    var html5QrcodeScanner;
-    var isProcessing = false;
-    
-    var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxdok04fCs9-zoQmWIq7zqwxknw000XnIwrcKP2R5ZHvD7lJrbVNLtBQedUts52I7MP5Q/exec";
+    var html5QrcodeScanner;
+    var isProcessing = false;
+    
+    var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxdok04fCs9-zoQmWIq7zqwxknw000XnIwrcKP2R5ZHvD7lJrbVNLtBQedUts52I7MP5Q/exec";
 
-    // 🔊 AUDIO / SPEECH ENGINE SETUP
-    var availableVoices = [];
+    // 🔊 AUDIO / SPEECH ENGINE SETUP
+    var availableVoices = [];
 
-    function populateVoiceList() {
-      if ('speechSynthesis' in window) {
-        availableVoices = window.speechSynthesis.getVoices();
-      }
-    }
+    function populateVoiceList() {
+      if ('speechSynthesis' in window) {
+        availableVoices = window.speechSynthesis.getVoices();
+      }
+    }
 
-    if ('speechSynthesis' in window) {
-      populateVoiceList();
-      if (speechSynthesis.onvoiceschanged !== undefined) {
-        speechSynthesis.onvoiceschanged = populateVoiceList;
-      }
-    }
+    if ('speechSynthesis' in window) {
+      populateVoiceList();
+      if (speechSynthesis.onvoiceschanged !== undefined) {
+        speechSynthesis.onvoiceschanged = populateVoiceList;
+      }
+    }
 
-    function speakPersonalizedWelcome(name) {
-      try {
-        if (!('speechSynthesis' in window)) return;
+    function speakPersonalizedWelcome(name, table) {
+      try {
+        if (!('speechSynthesis' in window)) return;
 
-        // Clear active speech queue safely
-        if (window.speechSynthesis.speaking) {
-          window.speechSynthesis.cancel();
-        }
+        // Clear active speech queue safely
+        if (window.speechSynthesis.speaking) {
+          window.speechSynthesis.cancel();
+        }
 
-        // 1. Remove text inside parentheses (e.g. "(HR Dept)")
-        var cleanName = name.split('(')[0].trim();
+        // 1. Remove text inside parentheses (e.g. "(HR Dept)")
+        var cleanName = name.split('(')[0].trim();
 
-        // 2. Remove common titles if present
-        cleanName = cleanName.replace(/^(Mr\.|Mrs\.|Ms\.|Dr\.|Dato\.|Datin\.|En\.|Puan|Cik)\s+/i, '');
+        // 2. Remove common titles if present
+        cleanName = cleanName.replace(/^(Mr\.|Mrs\.|Ms\.|Dr\.|Dato\.|Datin\.|En\.|Puan|Cik)\s+/i, '');
 
-        // 3. Shorten long names to first 2 words for smooth greeting
-        var nameWords = cleanName.split(/\s+/);
-        if (nameWords.length > 2) {
-          cleanName = nameWords[0] + " " + nameWords[1];
-        }
+        // 3. Shorten long names to first 2 words for smooth greeting
+        var nameWords = cleanName.split(/\s+/);
+        if (nameWords.length > 2) {
+          cleanName = nameWords[0] + " " + nameWords[1];
+        }
 
-        // 🎯 Spoken phrase updated to only mention the guest's name
-        var customSpeechText = "Welcome, " + cleanName + ".";
-        
-        var utterance = new SpeechSynthesisUtterance(customSpeechText);
+        var customSpeechText = "Welcome, " + cleanName + ". Your table assignment is " + table + ". Please enjoy the Annual Dinner.";
+        
+        var utterance = new SpeechSynthesisUtterance(customSpeechText);
 
-        if (availableVoices.length === 0) {
-          availableVoices = window.speechSynthesis.getVoices();
-        }
-        
-        var selectedVoice = availableVoices.find(function(v) {
-          return v.name.includes('Premium') || 
-                 v.name.includes('Natural') || 
-                 v.name.includes('Google US English') || 
-                 v.name.includes('Samantha') || 
-                 v.name.includes('Aria');
-        }) || availableVoices.find(function(v) {
-          return v.lang && (v.lang.startsWith('en') || v.lang.startsWith('en-US'));
-        });
+        if (availableVoices.length === 0) {
+          availableVoices = window.speechSynthesis.getVoices();
+        }
+        
+        var selectedVoice = availableVoices.find(function(v) {
+          return v.name.includes('Premium') || 
+                 v.name.includes('Natural') || 
+                 v.name.includes('Google US English') || 
+                 v.name.includes('Samantha') || 
+                 v.name.includes('Aria');
+        }) || availableVoices.find(function(v) {
+          return v.lang && (v.lang.startsWith('en') || v.lang.startsWith('en-US'));
+        });
 
-        if (selectedVoice) {
-          utterance.voice = selectedVoice;
-        }
+        if (selectedVoice) {
+          utterance.voice = selectedVoice;
+        }
 
-        utterance.rate = 0.95;
-        utterance.pitch = 1.0; 
+        utterance.rate = 0.95;
+        utterance.pitch = 1.0; 
 
-        // Buffer delay prevents camera shutdown from interrupting speech
-        setTimeout(function() {
-          window.speechSynthesis.speak(utterance);
-        }, 300);
+        // 🎯 Buffer delay prevents camera shutdown from interrupting speech
+        setTimeout(function() {
+          window.speechSynthesis.speak(utterance);
+        }, 300);
 
-      } catch (e) {
-        console.error("Personalized audio processing bypass:", e);
-      }
-    }
+      } catch (e) {
+        console.error("Personalized audio processing bypass:", e);
+      }
+    }
 
-    function unlockAudioEngine() {
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        var dummyUtterance = new SpeechSynthesisUtterance("");
-        dummyUtterance.volume = 0.01;
-        window.speechSynthesis.speak(dummyUtterance);
-      }
-    }
+    function unlockAudioEngine() {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        var dummyUtterance = new SpeechSynthesisUtterance("");
+        dummyUtterance.volume = 0.01;
+        window.speechSynthesis.speak(dummyUtterance);
+      }
+    }
 
-    function parseQrPayload(text) {
-      var extractedId = text;
-      var extractedTable = null;
+    function parseQrPayload(text) {
+      var extractedId = text;
+      var extractedTable = null;
 
-      if (text.includes("|")) {
-        var segments = text.split("|");
-        segments.forEach(function(segment) {
-          var parts = segment.split(":");
-          if (parts.length >= 2) {
-            var key = parts[0].trim().toUpperCase();
-            var val = parts.slice(1).join(":").trim();
-            if (key === "ID") extractedId = val;
-            if (key === "TABLE") extractedTable = val;
-          }
-        });
-      } else if (text.includes(":")) {
-        var parts = text.split(":");
-        extractedId = parts[parts.length - 1].trim();
-      }
+      if (text.includes("|")) {
+        var segments = text.split("|");
+        segments.forEach(function(segment) {
+          var parts = segment.split(":");
+          if (parts.length >= 2) {
+            var key = parts[0].trim().toUpperCase();
+            var val = parts.slice(1).join(":").trim();
+            if (key === "ID") extractedId = val;
+            if (key === "TABLE") extractedTable = val;
+          }
+        });
+      } else if (text.includes(":")) {
+        var parts = text.split(":");
+        extractedId = parts[parts.length - 1].trim();
+      }
 
-      return {
-        id: extractedId,
-        table: extractedTable
-      };
-    }
+      return {
+        id: extractedId,
+        table: extractedTable
+      };
+    }
 
-    function onScanSuccess(decodedText, decodedResult) {
-      if (isProcessing) return;
-      isProcessing = true;
-      
-      var resultDiv = document.getElementById('result');
-      resultDiv.classList.remove('animate-entrance');
-      resultDiv.style.display = 'block';
-      resultDiv.innerHTML = '<div class="success-header" style="color:#a0aec0; letter-spacing:2px;">Verifying Invitation...</div>';
-      
-      var rawText = decodedText.trim();
-      var parsedData = parseQrPayload(rawText);
-      var staffId = parsedData.id;
-      var qrTable = parsedData.table;
-      
-      var scriptId = 'google_jsonp_bridge';
-      var oldScript = document.getElementById(scriptId);
-      if (oldScript) oldScript.parentNode.removeChild(oldScript);
-      
-      window.handleGoogleResponse = function(responseString) {
-        html5QrcodeScanner.clear().then(function() {
-          var parts = responseString.split("|");
-          
-          if (parts[0] === "SUCCESS") {
-            var displayName = parts[1];    
-            var calculatedTable = qrTable || parts[2] || "UNASSIGNED"; 
-            var displayOutlet = parts[3] || "-";   
-            var luckyDrawNo = parts[4] || "-";
-            
-            resultDiv.classList.add('animate-entrance');
-            resultDiv.innerHTML = 
-              '<div class="success-header">✨ Welcome ✨</div>' +
-              '<div class="data-row"><div class="data-label">Guest Name</div><div class="data-value" style="color:var(--gold-light); font-weight:bold;">' + displayName + '</div></div>' +
-              '<div class="gold-divider"></div>' +
-              '<div class="data-row"><div class="data-label">Outlet</div><div class="data-value" style="color:#ffffff;">' + displayOutlet + '</div></div>' +
-              '<div class="gold-divider"></div>' +
-              '<div class="data-row"><div class="data-label">Guest Code</div><div class="data-value" style="font-size:14px; font-family:monospace;">' + staffId + '</div></div>' +
-              '<div class="table-badge">' +
-                '<div class="table-title">Table Assignment</div>' +
-                '<div class="table-number">' + calculatedTable.toUpperCase() + '</div>' +
-              '</div>' +
-              '<div class="lucky-badge">' +
-                '<div class="table-title">Lucky Draw No.</div>' +
-                '<div class="lucky-number">🎟️ ' + luckyDrawNo + '</div>' +
-              '</div>';
+    function onScanSuccess(decodedText, decodedResult) {
+      if (isProcessing) return;
+      isProcessing = true;
+      
+      var resultDiv = document.getElementById('result');
+      resultDiv.classList.remove('animate-entrance');
+      resultDiv.style.display = 'block';
+      resultDiv.innerHTML = '<div class="success-header" style="color:#a0aec0; letter-spacing:2px;">Verifying Invitation...</div>';
+      
+      var rawText = decodedText.trim();
+      var parsedData = parseQrPayload(rawText);
+      var staffId = parsedData.id;
+      var qrTable = parsedData.table;
+      
+      var scriptId = 'google_jsonp_bridge';
+      var oldScript = document.getElementById(scriptId);
+      if (oldScript) oldScript.parentNode.removeChild(oldScript);
+      
+      window.handleGoogleResponse = function(responseString) {
+        html5QrcodeScanner.clear().then(function() {
+          var parts = responseString.split("|");
+          
+          if (parts[0] === "SUCCESS") {
+            var displayName = parts[1];    
+            var calculatedTable = qrTable || parts[2] || "UNASSIGNED"; 
+            var displayOutlet = parts[3] || "-";   
+            var luckyDrawNo = parts[4] || "-";
+            
+            resultDiv.classList.add('animate-entrance');
+            resultDiv.innerHTML = 
+              '<div class="success-header">✨ Welcome ✨</div>' +
+              '<div class="data-row"><div class="data-label">Guest Name</div><div class="data-value" style="color:var(--gold-light); font-weight:bold;">' + displayName + '</div></div>' +
+              '<div class="gold-divider"></div>' +
+              '<div class="data-row"><div class="data-label">Outlet</div><div class="data-value" style="color:#ffffff;">' + displayOutlet + '</div></div>' +
+              '<div class="gold-divider"></div>' +
+              '<div class="data-row"><div class="data-label">Guest Code</div><div class="data-value" style="font-size:14px; font-family:monospace;">' + staffId + '</div></div>' +
+              '<div class="table-badge">' +
+                '<div class="table-title">Table Assignment</div>' +
+                '<div class="table-number">' + calculatedTable.toUpperCase() + '</div>' +
+              '</div>' +
+              '<div class="lucky-badge">' +
+                '<div class="table-title">Lucky Draw No.</div>' +
+                '<div class="lucky-number">🎟️ ' + luckyDrawNo + '</div>' +
+              '</div>';
 
-            // Spoken greeting now only takes displayName
-            speakPersonalizedWelcome(displayName);
+            speakPersonalizedWelcome(displayName, calculatedTable);
 
-            resetScanner(7000); 
-          } else {
-            resultDiv.innerHTML = "<h3 style='color:#fc8181;'>Invitation Unrecognized</h3><p style='font-size:13px;'>ID " + staffId + " is not registered on the seating charts.</p>";
-            resetScanner(4000);
-          }
-        }).catch(function(err) {
-          console.error("Camera reset issue: ", err);
-          isProcessing = false;
-        });
-      };
+            resetScanner(7000); 
+          } else {
+            resultDiv.innerHTML = "<h3 style='color:#fc8181;'>Invitation Unrecognized</h3><p style='font-size:13px;'>ID " + staffId + " is not registered on the seating charts.</p>";
+            resetScanner(4000);
+          }
+        }).catch(function(err) {
+          console.error("Camera reset issue: ", err);
+          isProcessing = false;
+        });
+      };
 
-      var jsonpUrl = GOOGLE_SCRIPT_URL + "?id=" + encodeURIComponent(staffId) + "&callback=handleGoogleResponse";
-      var script = document.createElement('script');
-      script.id = scriptId;
-      script.src = jsonpUrl;
-      
-      script.onerror = function() {
-        resultDiv.innerHTML = "<h3 style='color:#fc8181;'>Connection Timeout</h3><p style='font-size:13px;'>Could not reach the database script.</p>";
-        resetScanner(4000);
-      };
-      
-      document.body.appendChild(script);
-    }
+      var jsonpUrl = GOOGLE_SCRIPT_URL + "?id=" + encodeURIComponent(staffId) + "&callback=handleGoogleResponse";
+      var script = document.createElement('script');
+      script.id = scriptId;
+      script.src = jsonpUrl;
+      
+      script.onerror = function() {
+        resultDiv.innerHTML = "<h3 style='color:#fc8181;'>Connection Timeout</h3><p style='font-size:13px;'>Could not reach the database script.</p>";
+        resetScanner(4000);
+      };
+      
+      document.body.appendChild(script);
+    }
 
-    function initScanner() {
-      html5QrcodeScanner = new Html5QrcodeScanner("reader", { 
-        fps: 15, 
-        qrbox: { width: 250, height: 250 },
-        rememberLastUsedCamera: true,
-        aspectRatio: 1.0
-      }, false);
-      html5QrcodeScanner.render(onScanSuccess, function(error) {});
-    }
+    function initScanner() {
+      html5QrcodeScanner = new Html5QrcodeScanner("reader", { 
+        fps: 15, 
+        qrbox: { width: 250, height: 250 },
+        rememberLastUsedCamera: true,
+        aspectRatio: 1.0
+      }, false);
+      html5QrcodeScanner.render(onScanSuccess, function(error) {});
+    }
 
-    function resetScanner(delay) {
-      setTimeout(function() {
-        isProcessing = false;
-        var resultDiv = document.getElementById('result');
-        resultDiv.classList.remove('animate-entrance');
-        resultDiv.style.display = 'none';
-        initScanner();
-      }, delay);
-    }
+    function resetScanner(delay) {
+      setTimeout(function() {
+        isProcessing = false;
+        var resultDiv = document.getElementById('result');
+        resultDiv.classList.remove('animate-entrance');
+        resultDiv.style.display = 'none';
+        initScanner();
+      }, delay);
+    }
 
-    window.onload = function() {
-      initSlideshow(); 
-      initScanner();
-      populateVoiceList();
-      
-      document.body.addEventListener('click', unlockAudioEngine, { once: true });
-      document.body.addEventListener('touchstart', unlockAudioEngine, { once: true });
-    };
-  </script>
+    window.onload = function() {
+      initSlideshow(); 
+      initScanner();
+      populateVoiceList();
+      
+      document.body.addEventListener('click', unlockAudioEngine, { once: true });
+      document.body.addEventListener('touchstart', unlockAudioEngine, { once: true });
+    };
+  </script>
 </body>
 </html>
