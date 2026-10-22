@@ -327,18 +327,18 @@
         }
 
         // 1. Remove text inside parentheses (e.g. "(HR Dept)")
-        var cleanName = name.split('(')[0].trim();
+       // var cleanName = name.split('(')[0].trim();
 
         // 2. Remove common titles if present
-        cleanName = cleanName.replace(/^(Mr\.|Mrs\.|Ms\.|Dr\.|Dato\.|Datin\.|En\.|Puan|Cik)\s+/i, '');
+      //  cleanName = cleanName.replace(/^(Mr\.|Mrs\.|Ms\.|Dr\.|Dato\.|Datin\.|En\.|Puan|Cik)\s+/i, '');
 
         // 3. Shorten long names to first 2 words for smooth greeting
-        var nameWords = cleanName.split(/\s+/);
-        if (nameWords.length > 2) {
-          cleanName = nameWords[0] + " " + nameWords[1];
+      //  var nameWords = cleanName.split(/\s+/);
+     //   if (nameWords.length > 2) {
+       //   cleanName = nameWords[0] + " " + nameWords[1];
         }
 
-        var customSpeechText = "Welcome, " + cleanName + ". Your table assignment is " + table + ". Please enjoy the Annual Dinner.";
+        var customSpeechText = "Welcome ". Your table assignment is " + table + ". Please enjoy the Annual Dinner.";
         
         var utterance = new SpeechSynthesisUtterance(customSpeechText);
 
